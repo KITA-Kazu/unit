@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単位換算チャレンジ (60秒)</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f0f8ff; color: #333; padding: 20px; box-sizing: border-box; }
+        .container { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px; text-align: center; }
+        h1, h2, h3 { color: #007bff; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        #category-selection-screen label, #difficulty-selection-screen label { display: block; margin: 10px 0; font-size: 1.1em; }
+        #category-selection-screen input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); }
+        .difficulty-button { margin: 10px; padding: 15px 30px; font-size: 1.2em; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 1em; margin: 8px 4px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #question-area { margin-top: 15px; }
+        #question-text { font-size: 1.5em; margin-bottom: 15px; color: #333; }
+        .options button { display: block; width: 100%; margin: 8px 0; background-color: #6c757d; font-size: 1.1em; padding: 10px;}
+        .options button:hover { background-color: #5a6268; }
+        .options button.wrong-highlight { background-color: #dc3545 !important; color: white; }
+        .options button.correct-highlight { background-color: #ffc107 !important; color: #333; border: 2px solid #e0a800; }
+        #hint-button { background-color: #17a2b8; margin-top: 10px; }
+        #hint-button:hover { background-color: #138496; }
+        #hint-area { margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 5px; font-style: italic; display: none; color: #495057; }
+        #game-timer-display { font-size: 1.5em; color: #dc3545; font-weight: bold; margin-bottom: 10px; }
+        #status-bar { display: flex; justify-content: space-around; margin-bottom: 10px; font-size: 1.1em;}
+        #results-screen ul { list-style-type: none; padding: 0; }
+        #results-screen li { background-color: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: left; }
+        #results-screen li strong { color: #dc3545; }
+        #results-screen li .correct-answer { color: #ffc107; font-weight: bold; }
+        #results-screen li .explanation { font-style: italic; color: #555; margin-top: 5px; }
+        #title-display { font-size: 1.8em; color: #ffc107; margin-bottom: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>単位換算チャレンジ (60秒)</h1>
+
+        <!-- 1. カテゴリ選択画面 -->
+        <div id="category-selection-screen" class="screen active">
+            <h2>ステップ1: 練習する単位を選んでね (1つ以上)</h2>
+            <label><input type="checkbox" name="category" value="length"> 長さ (km, m, cm, mm)</label>
+            <label><input type="checkbox" name="category" value="weight"> 重さ (t, kg, g, mg)</label>
+            <label><input type="checkbox" name="category" value="time"> 時間 (日, 時間, 分, 秒)</label>
+            <label><input type="checkbox" name="category" value="area"> 面積 (km², ha, a, m², cm²)</label>
+            <label><input type="checkbox" name="category" value="volume"> かさ/容積 (kL, L, dL, mL)</label>
+            <button id="next-to-difficulty-button" disabled>次へ (むずかしさ選択)</button>
+        </div>
+
+        <!-- 2. 難易度選択画面 -->
+        <div id="difficulty-selection-screen" class="screen">
+            <h2>ステップ2: むずかしさを選んでね</h2>
+            <button class="difficulty-button" data-difficulty="easy">かんたん</button>
+            <button class="difficulty-button" data-difficulty="normal">ふつう</button>
+            <button class="difficulty-button" data-difficulty="hard">鬼モード</button>
+            <hr>
+            <button id="back-to-category-button">戻る (単位選択)</button>
+        </div>
+
+        <!-- 3. ゲーム画面 -->
+        <div id="game-screen" class="screen">
+            <div id="game-timer-display">残り時間: 60秒</div>
+            <div id="status-bar">
+                <span id="question-counter">問題: 1</span> |
+                <span id="score-display">得点: 0</span>
+            </div>
+            <div id="question-area">
+                <p id="question-text"></p>
+                <div class="options" id="options-container"></div>
+                <button id="hint-button">ヒントを見る</button>
+                <div id="hint-area">ここにヒントが表示されます</div>
+            </div>
+        </div>
+
+        <!-- 4. 結果画面 -->
+        <div id="results-screen" class="screen">
+             <h2>チャレンジ終了！</h2>
+            <p id="title-display"></p>
+            <p id="final-score"></p>
+            <p id="questions-answered-count"></p>
+            <h3>間違えた問題と解説:</h3>
+            <ul id="incorrect-answers-list"></ul>
+            <p id="no-mistakes-message" style="display:none;">全問正解！素晴らしい！</p>
+            <button id="retry-incorrect-button" style="display:none;">間違えた問題を解きなおす (時間制限なし)</button>
+            <button id="play-again-button">もう一度挑戦する</button>
+        </div>
+    </div>
+
+    <script>
+        const GAME_DURATION_SECONDS = 60;
+        const POINTS_PER_CORRECT_ANSWER = 10;
+        const PENALTY_FOR_WRONG_ANSWER = -5;
+
+        const MAX_VALUE_EASY_NORMAL = 999999;
+        const MAX_VALUE_HARD = 999999;
+        const MIN_VALUE_HARD = 0.00001;
+        const MAX_ZERO_COUNT_IN_OPTIONS = 5;
+
+        const UNIT_DEFINITIONS = {
+            length: { name: "長さ", units: [ { name: "mm", baseFactor: 1 }, { name: "cm", baseFactor: 10 }, { name: "m", baseFactor: 1000 }, { name: "km", baseFactor: 1000000 } ], conversions: [ { from: "m", to: "km", relation: "1000m = 1km" }, { from: "km", to: "m", relation: "1km = 1000m" }, { from: "cm", to: "m", relation: "100cm = 1m" }, { from: "m", to: "cm", relation: "1m = 100cm" }, { from: "mm", to: "cm", relation: "10mm = 1cm" }, { from: "cm", to: "mm", relation: "1cm = 10mm" } ] },
+            weight: { name: "重さ", units: [ { name: "mg", baseFactor: 1 }, { name: "g", baseFactor: 1000 }, { name: "kg", baseFactor: 1000000 }, { name: "t", baseFactor: 1000000000 } ], conversions: [ { from: "g", to: "kg", relation: "1000g = 1kg" }, { from: "kg", to: "g", relation: "1kg = 1000g" }, { from: "mg", to: "g", relation: "1000mg = 1g" }, { from: "g", to: "mg", relation: "1g = 1000mg" }, { from: "kg", to: "t", relation: "1000kg = 1t" }, { from: "t", to: "kg", relation: "1t = 1000kg" } ] },
+            time: { name: "時間", units: [ { name: "秒", baseFactor: 1 }, { name: "分", baseFactor: 60 }, { name: "時間", baseFactor: 3600 }, { name: "日", baseFactor: 86400 } ], conversions: [ { from: "秒", to: "分", relation: "60秒 = 1分" }, { from: "分", to: "秒", relation: "1分 = 60秒" }, { from: "分", to: "時間", relation: "60分 = 1時間" }, { from: "時間", to: "分", relation: "1時間 = 60分" }, { from: "時間", to: "日", relation: "24時間 = 1日" }, { from: "日", to: "時間", relation: "1日 = 24時間" } ] },
+            area: { name: "面積", units: [ { name: "cm²", baseFactor: 1 }, { name: "m²", baseFactor: 10000 }, { name: "a", baseFactor: 1000000 }, { name: "ha", baseFactor: 100000000 }, { name: "km²", baseFactor: 10000000000 } ], conversions: [ { from: "cm²", to: "m²", relation: "10000cm² = 1m²" }, { from: "m²", to: "a", relation: "100m² = 1a" }, { from: "a", to: "ha", relation: "100a = 1ha" }, { from: "ha", to: "km²", relation: "100ha = 1km²" }, { from: "m²", to: "ha", relation: "10000m² = 1ha"} ] },
+            volume: { name: "かさ/容積", units: [ { name: "mL", baseFactor: 1 }, { name: "dL", baseFactor: 100 }, { name: "L", baseFactor: 1000 }, { name: "kL", baseFactor: 1000000 } ], conversions: [ { from: "mL", to: "dL", relation: "100mL = 1dL" }, { from: "dL", to: "L", relation: "10dL = 1L" }, { from: "L", to: "kL", relation: "1000L = 1kL" }, { from: "mL", to: "L", relation: "1000mL = 1L" } ] }
+        };
+
+        const categorySelectionScreen = document.getElementById('category-selection-screen');
+        const difficultySelectionScreen = document.getElementById('difficulty-selection-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        
+        const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
+        const nextToDifficultyButton = document.getElementById('next-to-difficulty-button');
+        const backToCategoryButton = document.getElementById('back-to-category-button');
+        const difficultyButtons = document.querySelectorAll('.difficulty-button');
+
+        const gameTimerDisplay = document.getElementById('game-timer-display');
+        const questionCounterDisplay = document.getElementById('question-counter');
+        const scoreDisplay = document.getElementById('score-display');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const hintButton = document.getElementById('hint-button');
+        const hintArea = document.getElementById('hint-area');
+        
+        const titleDisplay = document.getElementById('title-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const questionsAnsweredCountDisplay = document.getElementById('questions-answered-count');
+        const incorrectAnswersList = document.getElementById('incorrect-answers-list');
+        const noMistakesMessage = document.getElementById('no-mistakes-message');
+        const retryIncorrectButton = document.getElementById('retry-incorrect-button');
+        const playAgainButton = document.getElementById('play-again-button');
+
+        let selectedCategories = [];
+        let currentDifficulty = '';
+        let allGeneratedQuestions = [];
+        let currentQuestionIndex = 0;
+        let questionsAnsweredInGame = 0;
+        let score = 0;
+        let incorrectAnswers = [];
+        let gameTimerInterval;
+        let isRetrying = false;
+
+        categoryCheckboxes.forEach(cb => cb.addEventListener('change', () => {
+            nextToDifficultyButton.disabled = getSelectedCategoriesInternal().length === 0;
+        }));
+
+        nextToDifficultyButton.addEventListener('click', () => {
+            selectedCategories = getSelectedCategoriesInternal();
+            if (selectedCategories.length > 0) {
+                switchScreen('difficulty-selection-screen');
+            }
+        });
+
+        backToCategoryButton.addEventListener('click', () => {
+            switchScreen('category-selection-screen');
+        });
+
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentDifficulty = button.dataset.difficulty;
+                startGameFlow(); // startGameFlowに変更
+            });
+        });
+        
+        playAgainButton.addEventListener('click', () => {
+            isRetrying = false;
+            switchScreen('category-selection-screen');
+            resetGame();
+        });
+
+        retryIncorrectButton.addEventListener('click', () => {
+            if (incorrectAnswers.length > 0) {
+                isRetrying = true;
+                allGeneratedQuestions = [...incorrectAnswers];
+                incorrectAnswers.forEach(q => delete q.userAnswer);
+                currentQuestionIndex = 0;
+                questionsAnsweredInGame = 0;
+                hintArea.style.display = 'none';
+                hintButton.disabled = false;
+                switchScreen('game-screen');
+                gameTimerDisplay.textContent = "解きなおし中 (時間制限なし)";
+                loadNextQuestion();
+            }
+        });
+        
+        hintButton.addEventListener('click', showHint);
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function getSelectedCategoriesInternal() { // 関数名を変更して衝突を避ける
+            return Array.from(categoryCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
+        }
+        
+        function resetGame() {
+            selectedCategories = [];
+            currentDifficulty = '';
+            allGeneratedQuestions = [];
+            currentQuestionIndex = 0;
+            questionsAnsweredInGame = 0;
+            score = 0;
+            incorrectAnswers = [];
+            clearInterval(gameTimerInterval);
+            gameTimerDisplay.textContent = `残り時間: ${GAME_DURATION_SECONDS}秒`;
+            scoreDisplay.textContent = "得点: 0";
+            questionCounterDisplay.textContent = "問題: 1";
+            hintArea.style.display = 'none';
+            hintButton.disabled = false;
+            categoryCheckboxes.forEach(cb => cb.checked = false);
+            nextToDifficultyButton.disabled = true;
+        }
+
+        function startGameFlow() { // startGameから変更して、問題生成と開始を分離
+            allGeneratedQuestions = generateAllPossibleQuestions(selectedCategories, currentDifficulty);
+            if (allGeneratedQuestions.length === 0) {
+                alert("問題を作成できませんでした。カテゴリや難易度を変えてお試しください。");
+                switchScreen('difficulty-selection-screen');
+                return;
+            }
+            for (let i = allGeneratedQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allGeneratedQuestions[i], allGeneratedQuestions[j]] = [allGeneratedQuestions[j], allGeneratedQuestions[i]];
+            }
+            
+            currentQuestionIndex = 0;
+            questionsAnsweredInGame = 0;
+            score = 0;
+            incorrectAnswers = [];
+            scoreDisplay.textContent = "得点: 0";
+            questionCounterDisplay.textContent = "問題: 1";
+            hintArea.style.display = 'none';
+            hintButton.disabled = false;
+
+            switchScreen('game-screen');
+            loadNextQuestion();
+            if (!isRetrying) {
+                 startOverallGameTimer();
+            }
+        }
+        
+        function startOverallGameTimer() {
+            let timeLeft = GAME_DURATION_SECONDS;
+            gameTimerDisplay.textContent = `残り時間: ${timeLeft}秒`;
+            gameTimerInterval = setInterval(() => {
+                timeLeft--;
+                gameTimerDisplay.textContent = `残り時間: ${timeLeft}秒`;
+                if (timeLeft <= 0) {
+                    clearInterval(gameTimerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function loadNextQuestion() {
+            hintArea.style.display = 'none';
+            hintButton.disabled = false;
+            optionsContainer.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('correct-highlight', 'wrong-highlight');
+                btn.style.backgroundColor = ''; 
+                btn.disabled = false;
+            });
+
+            if (currentQuestionIndex < allGeneratedQuestions.length) {
+                const question = allGeneratedQuestions[currentQuestionIndex];
+                if (!question) { // 万が一questionがundefinedの場合
+                    console.error("Error: Current question is undefined. Index:", currentQuestionIndex, "Pool size:", allGeneratedQuestions.length);
+                    if (!isRetrying) endGame(); else showResultsScreen();
+                    return;
+                }
+                questionText.textContent = question.text;
+                questionCounterDisplay.textContent = `問題: ${questionsAnsweredInGame + 1}`;
+                optionsContainer.innerHTML = '';
+                question.options.forEach((optionText, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = optionText;
+                    button.addEventListener('click', () => selectAnswer(index, button));
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                if (!isRetrying) endGame();
+                else {
+                    alert("間違えた問題をすべて解きなおしました！");
+                    showResultsScreen();
+                }
+            }
+        }
+        
+        function showHint() {
+            const question = allGeneratedQuestions[currentQuestionIndex];
+            if (question && question.hint) {
+                hintArea.textContent = question.hint;
+                hintArea.style.display = 'block';
+                hintButton.disabled = true;
+            }
+        }
+
+        function selectAnswer(selectedIndex, buttonElement) {
+            const question = allGeneratedQuestions[currentQuestionIndex];
+            if (!question) { console.error("selectAnswer: question undefined"); return; } // 安全策
+            const isCorrect = selectedIndex === question.correctAnswerIndex;
+            hintButton.disabled = true;
+
+            optionsContainer.querySelectorAll('button').forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === question.correctAnswerIndex) {
+                    btn.classList.add('correct-highlight');
+                }
+            });
+
+            if (isCorrect) {
+                score += POINTS_PER_CORRECT_ANSWER;
+            } else {
+                score += PENALTY_FOR_WRONG_ANSWER;
+                if (buttonElement) buttonElement.classList.add('wrong-highlight');
+                const incorrectQ = { ...question, userAnswer: buttonElement ? buttonElement.textContent : "不明" };
+                if(!isRetrying) incorrectAnswers.push(incorrectQ);
+            }
+            score = Math.max(0, score);
+            scoreDisplay.textContent = `得点: ${score}`;
+            questionsAnsweredInGame++;
+            currentQuestionIndex++;
+
+            if (isRetrying || (gameTimerInterval && parseInt(gameTimerDisplay.textContent.split(" ")[1] || "0") > 0) ) {
+                setTimeout(() => {
+                    loadNextQuestion();
+                }, 700);
+            } else if (!isRetrying) {
+                 endGame();
+            }
+        }
+        
+        function endGame() {
+            clearInterval(gameTimerInterval);
+            gameTimerDisplay.textContent = "時間切れ！";
+            setTimeout(showResultsScreen, 1000);
+        }
+
+        function showResultsScreen() {
+            switchScreen('results-screen');
+            titleDisplay.textContent = getTitle(score);
+            finalScoreDisplay.textContent = `最終得点: ${score}点`;
+            questionsAnsweredCountDisplay.textContent = `解答数: ${questionsAnsweredInGame}問`;
+
+            incorrectAnswersList.innerHTML = '';
+            if (incorrectAnswers.length > 0) {
+                noMistakesMessage.style.display = 'none';
+                retryIncorrectButton.style.display = 'inline-block';
+                incorrectAnswers.forEach(q => {
+                    const li = document.createElement('li');
+                    const displayQuestionValue = q.questionValue !== undefined ? q.questionValue : q.text.split(" ")[0];
+                    li.innerHTML = `<p><strong>問題:</strong> ${displayQuestionValue} は？ (元の問題文:${q.text})</p> <p><strong>あなたの答え:</strong> ${q.userAnswer}</p> <p><strong class="correct-answer">正しい答え:</strong> ${q.correctValue}</p> <p class="explanation"><strong>解説:</strong> ${q.explanation}</p>`;
+                    incorrectAnswersList.appendChild(li);
+                });
+            } else {
+                noMistakesMessage.style.display = 'block';
+                retryIncorrectButton.style.display = 'none';
+                 if(questionsAnsweredInGame > 0) noMistakesMessage.textContent = "全問正解！素晴らしい！";
+                 else noMistakesMessage.textContent = "時間内に解答できませんでした。もう一度挑戦しよう！";
+            }
+        }
+
+        function getTitle(currentScore) {
+            if (currentScore >= 200) return "🏆 単位換算ゴッド 🏆";
+            if (currentScore >= 150) return "🎉 単位換算チャンピオン！ 🎉";
+            if (currentScore >= 100) return "🥇 単位換算マスター 🥇";
+            if (currentScore >= 70) return "🥈 単位換算エキスパート 🥈";
+            if (currentScore >= 40) return "🥉 単位換算じょうず 🥉";
+            if (currentScore >= 10) return "💪 もうすこし！がんばろう 💪";
+            return "📝 ファイト！また挑戦しよう 📝";
+        }
+        
+        function gcd(a,b){ if(b===0) return a; return gcd(b, a%b); }
+
+        function formatNumber(num, difficulty) {
+            let s;
+            if (difficulty !== 'hard' || (typeof num === 'number' && Number.isInteger(num)) ) {
+                return String(Math.round(num));
+            }
+            if (num === 0) return "0";
+            s = parseFloat(num.toFixed(MAX_ZERO_COUNT_IN_OPTIONS + 3)).toString();
+            if (s.includes('.')) { s = s.replace(/0+$/, '').replace(/\.$/, ''); }
+            return s;
+        }
+
+        function hasAcceptableZeroCount(value, difficulty) {
+            const numStr = formatNumber(value, difficulty);
+            if (numStr.includes('e')) return true;
+            if (numStr.includes('.') && difficulty === 'hard') return true;
+            let significantPart = numStr;
+            let zeroCount = 0;
+            if (significantPart.length > 1 && significantPart !== "0") {
+                 for(let i = significantPart.length -1; i >=0; i--) { if(significantPart[i] === '0') zeroCount++; else break; }
+            }
+            return zeroCount <= MAX_ZERO_COUNT_IN_OPTIONS;
+        }
+
+        function isValueWithinLimits(value, difficulty) {
+            const numStr = formatNumber(value, difficulty);
+            if (numStr.includes('e')) { return true; }
+
+            if (!hasAcceptableZeroCount(value, difficulty) && difficulty !== 'hard') return false;
+
+            const num = parseFloat(numStr); // parseFloatで数値に戻して比較
+            if (difficulty !== 'hard') {
+                return Number.isInteger(num) && num >= (difficulty === 'easy' ? 0 : 1) && num <= MAX_VALUE_EASY_NORMAL;
+            } else {
+                const absValue = Math.abs(num);
+                if (num === 0) return true;
+                // MIN_VALUE_HARD より小さい正の数も許容する (例: 0.00005 など)
+                return absValue > 0 && absValue <= MAX_VALUE_HARD;
+            }
+        }
+
+
+        function generateSingleQuestion(categoryKey, difficulty) {
+            const MAX_ATTEMPTS_PER_Q = 250;
+            for (let attempt = 0; attempt < MAX_ATTEMPTS_PER_Q; attempt++) {
+                const categoryData = UNIT_DEFINITIONS[categoryKey];
+                if (!categoryData || !categoryData.units) {
+                    console.error(`Error: UNIT_DEFINITIONS for ${categoryKey} is invalid.`);
+                    return null;
+                }
+                const availableUnits = categoryData.units;
+                if (availableUnits.length < 2) return null;
+
+                let unit1Idx, unit2Idx, fromUnit, toUnit;
+                let questionValueNum, correctAnswerValueNum;
+
+                if (difficulty === 'easy') {
+                    const easyPairs = [];
+                    for(let i=0; i < availableUnits.length -1; i++){
+                        easyPairs.push([i, i+1]); easyPairs.push([i+1, i]);
+                    }
+                    // 特別なペアの追加 (例: 長さのmとkm)
+                    if (categoryKey === 'length') {
+                        const mIdx = availableUnits.findIndex(u => u.name === 'm');
+                        const kmIdx = availableUnits.findIndex(u => u.name === 'km');
+                        if (mIdx !== -1 && kmIdx !== -1) {
+                            easyPairs.push([mIdx, kmIdx]); easyPairs.push([kmIdx, mIdx]);
+                        }
+                    }
+                    if (categoryKey === 'volume') {
+                        const lIdx = availableUnits.findIndex(u => u.name === 'L');
+                        const mlIdx = availableUnits.findIndex(u => u.name === 'mL');
+                        const klIdx = availableUnits.findIndex(u => u.name === 'kL');
+                        if (lIdx !== -1 && mlIdx !== -1) { easyPairs.push([lIdx, mlIdx]); easyPairs.push([mlIdx, lIdx]); }
+                        if (lIdx !== -1 && klIdx !== -1) { easyPairs.push([lIdx, klIdx]); easyPairs.push([klIdx, lIdx]); }
+                    }
+
+                    if(easyPairs.length === 0) {
+                        unit1Idx = Math.floor(Math.random() * availableUnits.length);
+                        do { unit2Idx = Math.floor(Math.random() * availableUnits.length); } while (unit1Idx === unit2Idx);
+                    } else {
+                        const pair = easyPairs[Math.floor(Math.random() * easyPairs.length)];
+                        unit1Idx = pair[0]; unit2Idx = pair[1];
+                         if (unit1Idx === undefined || unit2Idx === undefined || unit1Idx >= availableUnits.length || unit2Idx >= availableUnits.length || unit1Idx === unit2Idx) {
+                            continue; // 不正なペアなら再試行
+                        }
+                    }
+                } else {
+                    unit1Idx = Math.floor(Math.random() * availableUnits.length);
+                    do { unit2Idx = Math.floor(Math.random() * availableUnits.length); } while (unit1Idx === unit2Idx);
+                }
+                fromUnit = availableUnits[unit1Idx];
+                toUnit = availableUnits[unit2Idx];
+
+                if (difficulty === 'easy') {
+                    questionValueNum = 1;
+                    if (categoryKey === 'time') {
+                        if (fromUnit.name === "日" && toUnit.name === "時間") questionValueNum = 1;
+                        else if (fromUnit.name === "時間" && toUnit.name === "分") questionValueNum = 1;
+                        else if (fromUnit.name === "分" && toUnit.name === "秒") questionValueNum = 1;
+                        else if (fromUnit.name === "時間" && toUnit.name === "日") questionValueNum = 24;
+                        else if (fromUnit.name === "分" && toUnit.name === "時間") questionValueNum = 60;
+                        else if (fromUnit.name === "秒" && toUnit.name === "分") questionValueNum = 60;
+                        else { if(Math.random() < 0.85) continue; questionValueNum = 1;}
+                    }
+                } else if (difficulty === 'normal') {
+                    if (categoryKey === 'time') {
+                        const timeVals = [1,2,3,4,5,6,10,12,15,20,24,30,45,50,60,90,120,150,180,240,300,360,480,600];
+                        questionValueNum = timeVals[Math.floor(Math.random() * timeVals.length)];
+                        if ((fromUnit.name === "日" && toUnit.name === "秒") || (toUnit.name === "日" && fromUnit.name === "秒")) {if(Math.random()<0.95)continue;};
+                         if (fromUnit.baseFactor / toUnit.baseFactor > 72000 || toUnit.baseFactor / fromUnit.baseFactor > 72000) {if(Math.random()<0.95)continue;}; // さらに制限
+                    } else {
+                        const normalValues = [2,3,4,5,6,7,8,9,10,12,15,20,25,30,40,50,60,75,80,100,120,150,200,250,300,400,500,600,750,800,1000,1250,1500,2000,2500,3000,4000,5000, 10000, 20000];
+                        questionValueNum = normalValues[Math.floor(Math.random() * normalValues.length)];
+                    }
+                } else { // difficulty === 'hard'
+                    if (categoryKey === 'time') {
+                        const timeValsHard = [1.5, 2.5, 0.5, 0.25, 75, 135, 210, 1500, 48, 72, 90, 100, 3600, 6000, 7200, 8640];
+                        questionValueNum = timeValsHard[Math.floor(Math.random() * timeValsHard.length)];
+                        if(Math.random() < 0.5) {
+                             const timeVals = [1,2,3,4,5,6,10,12,15,20,24,30,45,50,60,90,120,150,180,240,300,360,480,600,1200,1440];
+                             questionValueNum = timeVals[Math.floor(Math.random() * timeVals.length)];
+                        }
+                    } else {
+                        const hardBase = [0.01, 0.02, 0.025, 0.04, 0.05, 0.1, 0.125, 0.2, 0.25, 0.4, 0.5, 0.75, 0.8, 1, 1.2, 1.25, 1.5, 1.6, 2, 2.4, 2.5, 3, 3.5, 4, 5, 6, 7.5, 8, 10, 12, 12.5, 15, 16, 20, 24, 25, 30, 40, 50, 60, 75, 80, 100, 120, 125, 150, 160, 200, 240, 250, 300, 400, 500, 600, 750, 800, 1000, 1200, 1500, 1600, 2000, 2500, 3000, 4000, 5000, 6000, 8000, 10000];
+                        questionValueNum = hardBase[Math.floor(Math.random() * hardBase.length)];
+                        const scaleRatio = fromUnit.baseFactor / toUnit.baseFactor;
+                        if (scaleRatio > 100000 && questionValueNum > 0.1) questionValueNum /= ((Math.floor(Math.random()*5)+1)*1000);
+                        else if (scaleRatio > 10000 && questionValueNum > 0.5) questionValueNum /= ((Math.floor(Math.random()*5)+1)*100);
+                        else if (scaleRatio > 1000 && questionValueNum > 1) questionValueNum /= ((Math.floor(Math.random()*5)+1)*10);
+                        if (scaleRatio < 0.00001 && questionValueNum < 10000 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*1000);
+                        else if (scaleRatio < 0.0001 && questionValueNum < 1000 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*100);
+                        else if (scaleRatio < 0.01 && questionValueNum < 100 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*10);
+                    }
+                    questionValueNum = parseFloat(questionValueNum.toFixed(4));
+                }
+                
+                correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
+
+                if (difficulty !== 'hard') {
+                    let originalCorrect = correctAnswerValueNum;
+                    correctAnswerValueNum = Math.round(correctAnswerValueNum);
+                     // 答えが0になる場合、元の値が非常に小さい場合なので、questionValueNumを調整する
+                    if (correctAnswerValueNum === 0 && originalCorrect > 0 && difficulty !== 'easy') { // かんたんは0の答えを許容
+                         // questionValueNumを、答えが最低でも1になるように調整
+                        let minQ = toUnit.baseFactor / fromUnit.baseFactor; // 答えが1になるquestionValue
+                        if (minQ < 1 && Number.isInteger(1/minQ)) minQ = 1/minQ; // 逆数も考慮
+                        else minQ = Math.max(1, Math.ceil(minQ));
+                        questionValueNum = minQ;
+                        correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
+                        correctAnswerValueNum = Math.round(correctAnswerValueNum);
+                    }
+                    if (!Number.isInteger(questionValueNum) && categoryKey !== 'time') { // 時間以外は問題も整数にしたい
+                        questionValueNum = Math.round(questionValueNum);
+                        if(questionValueNum === 0 && difficulty !== 'easy') questionValueNum = 1;
+                        correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
+                        correctAnswerValueNum = Math.round(correctAnswerValueNum);
+                    }
+                    if (!Number.isInteger(correctAnswerValueNum) || correctAnswerValueNum < (difficulty === 'easy' ? 0:1) ) continue;
+                    if (questionValueNum < (difficulty === 'easy' ? 0:1)) continue; // 問題の値も0以上または1以上
+                } else {
+                     correctAnswerValueNum = parseFloat(correctAnswerValueNum.toFixed(5));
+                     if (correctAnswerValueNum === 0 && questionValueNum !== 0) { // 鬼モードで答えが0になるのは避ける (問題が0でない限り)
+                         if (Math.abs(questionValueNum * fromUnit.baseFactor / toUnit.baseFactor) < MIN_VALUE_HARD) continue;
+                     }
+                }
+
+                if (!isValueWithinLimits(questionValueNum, difficulty) || !isValueWithinLimits(correctAnswerValueNum, difficulty)) {
+                    continue;
+                }
+
+                const qText = `${formatNumber(questionValueNum, difficulty)}${fromUnit.name} は？`;
+                const options = new Set();
+                const correctAnswerFormatted = formatNumber(correctAnswerValueNum, difficulty);
+                options.add(correctAnswerFormatted);
+                let distractorCount = 0;
+
+                if (difficulty === 'easy' && categoryKey !== 'time') {
+                     const easyFactors = [10, 0.1, 100, 0.01, 1000, 0.001, 0];
+                    easyFactors.sort(() => Math.random() -0.5);
+                    for(const factor of easyFactors){
+                        if(options.size >= 4) break;
+                        let distVal = (factor === 0 && correctAnswerValueNum !== 0) ? 0 : correctAnswerValueNum * factor;
+                        if (correctAnswerValueNum === 0) {
+                             const zeroAnsOpts = [0, 1, 10, 100, 1000];
+                             distVal = zeroAnsOpts[Math.floor(Math.random()*zeroAnsOpts.length)];
+                        } else { distVal = Math.round(distVal); }
+                        const dist = formatNumber(distVal, difficulty);
+                        if(!options.has(dist) && dist !== correctAnswerFormatted && isValueWithinLimits(distVal,difficulty)) options.add(dist);
+                    }
+                } else if (categoryKey === 'time' && (difficulty === 'easy' || difficulty === 'normal') ) {
+                    let baseAns = Math.round(correctAnswerValueNum);
+                    const timeOptionDeltas = [Math.max(1, Math.floor(baseAns*0.5)), Math.max(1,Math.floor(baseAns*0.25)), baseAns*2, baseAns*3, Math.max(0, baseAns-1), baseAns+1, baseAns*10, Math.max(0, Math.round(baseAns/10))];
+                    if (baseAns === 0 && difficulty==='easy') timeOptionDeltas.push(0,1,60,24);
+                    timeOptionDeltas.sort(() => Math.random()-0.5);
+                    for(const delta of timeOptionDeltas){
+                        if(options.size >=4) break;
+                        let distVal;
+                        if(Math.random() < 0.6 && baseAns >= delta ) distVal = baseAns - delta; // baseAns >= delta でないと負になる
+                        else distVal = baseAns + delta;
+                        distVal = Math.max(0, Math.round(distVal));
+                        const distStr = formatNumber(distVal, difficulty);
+                        if(!options.has(distStr) && distStr !== correctAnswerFormatted && isValueWithinLimits(distVal, difficulty)) options.add(distStr);
+                    }
+                }
+                
+                const distractorPowers = difficulty === 'hard' ? [-4,-3, -2, -1, 1, 2, 3, 4] : [-2, -1, 1, 2, 0.5, 2.5]; // ふつうにも小数点を少し混ぜる
+                distractorPowers.sort(() => Math.random() - 0.5);
+                for (const power of distractorPowers) {
+                    if (options.size >= 4) break;
+                    let distractorNum = correctAnswerValueNum * ( (typeof power === 'number' && (power < 0 || power > 0 && power <=4)) ? Math.pow(10, power) : power ); // 0.5や2.5のような係数も使えるように
+                    if (difficulty !== 'hard') distractorNum = Math.round(distractorNum);
+                    else distractorNum = parseFloat(distractorNum.toFixed(5));
+
+                    if (isValueWithinLimits(distractorNum, difficulty) && (difficulty === 'hard' || hasAcceptableZeroCount(distractorNum, difficulty))) {
+                        const formattedDistractor = formatNumber(distractorNum, difficulty);
+                        if (!options.has(formattedDistractor) && formattedDistractor !== correctAnswerFormatted) {
+                            options.add(formattedDistractor);
+                        }
+                    }
+                }
+                while (options.size < 4 && distractorCount < 50) {
+                    distractorCount++;
+                    let distractorNum;
+                    if(difficulty !== 'hard' && Math.random() < 0.7) {
+                        distractorNum = Math.round(correctAnswerValueNum) + (Math.floor(Math.random()* (difficulty==='easy'? 5:15) )+1) * (Math.random() > 0.5 ? 1: -1);
+                        distractorNum = Math.max((difficulty === 'easy' ? 0 : 1), distractorNum);
+                    } else {
+                        distractorNum = correctAnswerValueNum * Math.pow(10, (Math.floor(Math.random()* (difficulty==='easy'?2: (difficulty==='normal'?3:4)) )+1) * (Math.random() > 0.5 ? 1: -1));
+                    }
+                     if (difficulty !== 'hard') distractorNum = Math.round(distractorNum);
+                     else distractorNum = parseFloat(distractorNum.toFixed(5));
+
+                    if (isValueWithinLimits(distractorNum, difficulty) && (difficulty === 'hard' || hasAcceptableZeroCount(distractorNum, difficulty))) {
+                        const formattedDistractor = formatNumber(distractorNum, difficulty);
+                        if (!options.has(formattedDistractor) && formattedDistractor !== correctAnswerFormatted) {
+                            options.add(formattedDistractor);
+                        }
+                    }
+                }
+                const fillOptionsBase = difficulty === 'easy' ? [0,1,10,100,1000] : [1,10,100,1000,0.1,0.01, 0.001, 0.5, 2, 5];
+                let fillOptions = [];
+                if (difficulty !== 'hard') {
+                    fillOptions = fillOptionsBase.filter(n => Number.isInteger(n) && n>= (difficulty==='easy'?0:1) );
+                } else {
+                    fillOptions = fillOptionsBase;
+                }
+
+                while (options.size < 4) {
+                    if (fillOptions.length === 0) {
+                        options.add(formatNumber(correctAnswerValueNum + options.size + Math.random()*0.1, difficulty));
+                        if(options.size >=4) break; continue;
+                    }
+                    const fillVal = fillOptions[Math.floor(Math.random()*fillOptions.length)];
+                    const fillStr = formatNumber(fillVal, difficulty);
+                    if(!options.has(fillStr) && fillStr !== correctAnswerFormatted && isValueWithinLimits(fillVal,difficulty)) options.add(fillStr);
+                    else options.add(formatNumber(correctAnswerValueNum / (options.size + Math.random()*0.5 + 1.05), difficulty));
+                    if(options.size >= 4) break;
+                }
+
+                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+                const correctIdx = shuffledOptions.findIndex(opt => opt === correctAnswerFormatted);
+
+                let hintText = `ヒント: ${fromUnit.name} と ${toUnit.name} の関係を思い出そう。`;
+                const directConv = categoryData.conversions.find(c => (c.from === fromUnit.name && c.to === toUnit.name) || (c.from === toUnit.name && c.to === fromUnit.name));
+                if (directConv) hintText = `ヒント: ${directConv.relation}`;
+
+                let explanation = `1${fromUnit.name} は ${formatNumber(fromUnit.baseFactor / toUnit.baseFactor, difficulty)}${toUnit.name} です。 だから、${formatNumber(questionValueNum, difficulty)}${fromUnit.name} は ${correctAnswerFormatted}${toUnit.name} になります。`;
+
+                return {
+                    text: qText, options: shuffledOptions.map(opt => `${opt}${toUnit.name}`),
+                    correctAnswerIndex: correctIdx, correctValue: `${correctAnswerFormatted}${toUnit.name}`,
+                    questionValue: `${formatNumber(questionValueNum, difficulty)}${fromUnit.name}`, 
+                    explanation: explanation, hint: hintText, category: categoryKey
+                };
+            }
+            // console.warn(`generateSingleQuestion: ${categoryKey} (${difficulty}) で問題生成に ${MAX_ATTEMPTS_PER_Q}回失敗しました。`);
+            return null;
+        }
+
+        function generateAllPossibleQuestions(categories, difficulty) {
+            const questions = [];
+            // 各カテゴリから均等に問題を選ぶため、カテゴリごとに上限を設定
+            // ただし、時間内に多くの問題に答えられるように、プールは多めに用意する
+            const questionsToAimPerCategory = Math.max(5, Math.ceil( (GAME_DURATION_SECONDS / 3) / categories.length) + 15); // 1問3秒と仮定 + α
+            let totalGenerated = 0;
+
+            categories.forEach(catKey => {
+                let generatedForThisCategory = 0;
+                for (let i = 0; i < questionsToAimPerCategory * 5 && generatedForThisCategory < questionsToAimPerCategory; i++) { // 試行回数に余裕を持たせる
+                    const q = generateSingleQuestion(catKey, difficulty);
+                    if (q) {
+                        if (!questions.find(exQ => exQ.text === q.text && exQ.correctValue === q.correctValue)) {
+                            questions.push(q);
+                            generatedForThisCategory++;
+                            totalGenerated++;
+                        }
+                    }
+                }
+            });
+             // もし問題が極端に少ない場合（例えば1カテゴリのみで生成が難しい場合）、カテゴリ無視で追加生成を試みる
+            let emergencyAttempts = 0;
+            while(questions.length < Math.min(20, categories.length * 5) && emergencyAttempts < 100){ // 最低でも20問かカテゴリ*5問は欲しい
+                 const randomCatKey = categories[Math.floor(Math.random() * categories.length)];
+                 const q = generateSingleQuestion(randomCatKey, difficulty);
+                 if(q && !questions.find(exQ => exQ.text === q.text && exQ.correctValue === q.correctValue)){
+                     questions.push(q);
+                 }
+                 emergencyAttempts++;
+            }
+
+            if(questions.length === 0) console.warn("最終的に問題が1問も生成できませんでした。");
+            return questions;
+        }
+        
+        switchScreen('category-selection-screen');
+        resetGame();
+
+    </script>
+</body>
+</html>
