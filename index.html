@@ -3,698 +3,1008 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>単位換算チャレンジ (60秒)</title>
+    <title>わくわく！たんいマスターへの冒険 - クイズ版</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f0f8ff; color: #333; padding: 20px; box-sizing: border-box; }
-        .container { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px; text-align: center; }
-        h1, h2, h3 { color: #007bff; }
-        .screen { display: none; }
-        .screen.active { display: block; }
-        #category-selection-screen label, #difficulty-selection-screen label { display: block; margin: 10px 0; font-size: 1.1em; }
-        #category-selection-screen input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); }
-        .difficulty-button { margin: 10px; padding: 15px 30px; font-size: 1.2em; }
-        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 1em; margin: 8px 4px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s; }
-        button:hover { background-color: #0056b3; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        #question-area { margin-top: 15px; }
-        #question-text { font-size: 1.5em; margin-bottom: 15px; color: #333; }
-        .options button { display: block; width: 100%; margin: 8px 0; background-color: #6c757d; font-size: 1.1em; padding: 10px;}
-        .options button:hover { background-color: #5a6268; }
-        .options button.wrong-highlight { background-color: #dc3545 !important; color: white; }
-        .options button.correct-highlight { background-color: #ffc107 !important; color: #333; border: 2px solid #e0a800; }
-        #hint-button { background-color: #17a2b8; margin-top: 10px; }
-        #hint-button:hover { background-color: #138496; }
-        #hint-area { margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 5px; font-style: italic; display: none; color: #495057; }
-        #game-timer-display { font-size: 1.5em; color: #dc3545; font-weight: bold; margin-bottom: 10px; }
-        #status-bar { display: flex; justify-content: space-around; margin-bottom: 10px; font-size: 1.1em;}
-        #results-screen ul { list-style-type: none; padding: 0; }
-        #results-screen li { background-color: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: left; }
-        #results-screen li strong { color: #dc3545; }
-        #results-screen li .correct-answer { color: #ffc107; font-weight: bold; }
-        #results-screen li .explanation { font-style: italic; color: #555; margin-top: 5px; }
-        #title-display { font-size: 1.8em; color: #ffc107; margin-bottom: 20px; font-weight: bold; }
+        /* --- 全体のスタイル --- */
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: linear-gradient(135deg, #a8e0ff 0%, #f0f8ff 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 700px;
+        }
+
+        /* --- 画面の切り替え --- */
+        .screen {
+            display: none; /* 最初はすべての画面を隠す */
+        }
+        .screen.active {
+            display: block; /* activeクラスがついた画面だけ表示 */
+        }
+
+        /* --- 見出しとテキスト --- */
+        h1 {
+            color: #005a9c;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #0077cc;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .character-message {
+            background-color: #eef7ff;
+            border-left: 5px solid #4a90e2;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        /* --- ボタン --- */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #50e3c2 0%, #34c7a9 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+
+         .btn-answer {
+            background-color: #fff;
+            color: #0077cc;
+            border: 2px solid #0077cc;
+            font-size: 1.4rem;
+            padding: 15px;
+            border-radius: 10px;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            width: 100%;
+            box-shadow: none;
+        }
+
+        .btn-answer:hover:not(:disabled) {
+             background-color: #eef7ff;
+             transform: none;
+             box-shadow: none;
+        }
+         .btn-answer:active:not(:disabled) {
+             background-color: #ddedff;
+             transform: none;
+         }
+         
+        .btn-answer:disabled { /* 回答後のスタイル */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-back {
+            background: #aaa;
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        /* --- 問題画面のスタイル --- */
+        #question-area {
+            background-color: #fff9e6;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #ffc107;
+        }
+
+        #game-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #timer-area {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        #score-board {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #005a9c;
+        }
+
+        #question-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        
+        #choices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        /* --- フィードバックのスタイル --- */
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: none;
+            animation-duration: 0.5s;
+        }
+
+        #feedback.correct {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 2px solid #d6e9c6;
+            display: block;
+            animation-name: bounce;
+        }
+
+        #feedback.incorrect {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 2px solid #ebccd1;
+            display: block;
+            animation-name: shake;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* --- 結果画面のスタイル --- */
+        #medal-area {
+            margin-bottom: 20px;
+        }
+        #medal-icon {
+            font-size: 7rem;
+            display: block;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+        #medal-name {
+            font-size: 2.2rem;
+            color: #005a9c;
+            margin: 0;
+        }
+        #final-score-text {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #d9534f;
+            margin: 10px 0;
+        }
+        .highlight {
+            color: #d9534f;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>単位換算チャレンジ (60秒)</h1>
-
-        <!-- 1. カテゴリ選択画面 -->
-        <div id="category-selection-screen" class="screen active">
-            <h2>ステップ1: 練習する単位を選んでね (1つ以上)</h2>
-            <label><input type="checkbox" name="category" value="length"> 長さ (km, m, cm, mm)</label>
-            <label><input type="checkbox" name="category" value="weight"> 重さ (t, kg, g, mg)</label>
-            <label><input type="checkbox" name="category" value="time"> 時間 (日, 時間, 分, 秒)</label>
-            <label><input type="checkbox" name="category" value="area"> 面積 (km², ha, a, m², cm²)</label>
-            <label><input type="checkbox" name="category" value="volume"> かさ/容積 (kL, L, dL, mL)</label>
-            <button id="next-to-difficulty-button" disabled>次へ (むずかしさ選択)</button>
+        <!-- 画面1: スタート画面 -->
+        <div id="start-screen" class="screen active">
+            <h1>わくわく！<br>たんいマスターへの冒険</h1>
+            <p class="character-message">
+                <span style="font-size: 2rem; vertical-align: middle;">🎓</span>
+                やあ、わたしはたんい博士じゃ！<br>
+                これからキミをたんいの世界へあんないするぞ。<br>
+                <span class="highlight">1分間</span>でどれだけ多くの問題にチャレンジできるかな？
+            </p>
+            <button class="btn" onclick="showScreen('unit-select-screen')">冒険をはじめる！</button>
         </div>
 
-        <!-- 2. 難易度選択画面 -->
-        <div id="difficulty-selection-screen" class="screen">
-            <h2>ステップ2: むずかしさを選んでね</h2>
-            <button class="difficulty-button" data-difficulty="easy">かんたん</button>
-            <button class="difficulty-button" data-difficulty="normal">ふつう</button>
-            <button class="difficulty-button" data-difficulty="hard">鬼モード</button>
-            <hr>
-            <button id="back-to-category-button">戻る (単位選択)</button>
-        </div>
-
-        <!-- 3. ゲーム画面 -->
-        <div id="game-screen" class="screen">
-            <div id="game-timer-display">残り時間: 60秒</div>
-            <div id="status-bar">
-                <span id="question-counter">問題: 1</span> |
-                <span id="score-display">得点: 0</span>
+        <!-- 画面2: 単位選択画面 -->
+        <div id="unit-select-screen" class="screen">
+            <h2>どの単位を冒険する？</h2>
+            <div class="btn-grid">
+                <button class="btn" onclick="selectUnit('length')">📏 長さ</button>
+                <button class="btn" onclick="selectUnit('weight')">⚖️ 重さ</button>
+                <button class="btn" onclick="selectUnit('volume')">💧 かさ</button>
+                <button class="btn" onclick="selectUnit('time')">⏰ 時間</button>
+                <button class="btn" onclick="selectUnit('area')">🗺️ 面積</button>
             </div>
+            <button class="btn btn-back" onclick="showScreen('start-screen')">もどる</button>
+        </div>
+
+        <!-- 画面3: モード選択画面 -->
+        <div id="mode-select-screen" class="screen">
+            <h2 id="mode-select-title">モードをえらぼう！</h2>
+            <div class="btn-grid">
+                <button class="btn" onclick="selectMode('practice')">💪 換算練習モード</button>
+                <button class="btn btn-secondary" onclick="selectMode('sense')">💡 単位感覚モード</button>
+            </div>
+            <button class="btn btn-back" onclick="showScreen('unit-select-screen')">たんいをえらびなおす</button>
+        </div>
+
+        <!-- 画面4: レベル選択画面 (換算練習モード) -->
+        <div id="level-select-screen" class="screen">
+            <h2>むずかしさをえらんでね</h2>
+            <div class="btn-grid">
+                <button class="btn" onclick="startPractice('easy')">🔰 初級 (かんたんな整数)</button>
+                <button class="btn" onclick="startPractice('medium')">⭐ 中級 (10の倍数など)</button>
+                <button class="btn" onclick="startPractice('hard')">🔥 上級 (小数・合わさった単位)</button>
+            </div>
+            <button class="btn btn-back" onclick="showScreen('mode-select-screen')">モードをえらびなおす</button>
+        </div>
+
+        <!-- 画面5: 問題画面 -->
+        <div id="question-screen" class="screen">
+             <h2 id="question-screen-title">もんだい！</h2>
+            <div id="game-status-bar">
+                <div id="score-board">とくてん: <span id="score">0</span>点</div>
+                <div id="timer-area">のこり時間: <span id="timer-count">60</span>びょう</div>
+            </div>
+
             <div id="question-area">
-                <p id="question-text"></p>
-                <div class="options" id="options-container"></div>
-                <button id="hint-button">ヒントを見る</button>
-                <div id="hint-area">ここにヒントが表示されます</div>
+                <div id="question-text">ここに問題がでます</div>
+            </div>
+
+            <div id="choices-grid">
+                <!-- 回答選択肢ボタンがここにJSで挿入される -->
+            </div>
+
+            <div id="feedback"></div>
+
+            <button class="btn btn-back" onclick="backToModeSelect()">もどる</button>
+        </div>
+
+        <!-- 画面6: 結果画面 -->
+        <div id="result-screen" class="screen">
+            <h2>けっか はっぴょう！</h2>
+            <div id="medal-area">
+                <span id="medal-icon"></span>
+                <h3 id="medal-name"></h3>
+            </div>
+            <p>あなたのとくてんは...</p>
+            <p id="final-score-text"><span id="final-score">0</span>点</p>
+            <div id="result-message" class="character-message"></div>
+            <div class="btn-grid">
+                <button class="btn" onclick="restartQuiz()">もういちどチャレンジ！</button>
+                <button class="btn btn-secondary" onclick="showScreen('start-screen')">トップにもどる</button>
             </div>
         </div>
 
-        <!-- 4. 結果画面 -->
-        <div id="results-screen" class="screen">
-             <h2>チャレンジ終了！</h2>
-            <p id="title-display"></p>
-            <p id="final-score"></p>
-            <p id="questions-answered-count"></p>
-            <h3>間違えた問題と解説:</h3>
-            <ul id="incorrect-answers-list"></ul>
-            <p id="no-mistakes-message" style="display:none;">全問正解！素晴らしい！</p>
-            <button id="retry-incorrect-button" style="display:none;">間違えた問題を解きなおす (時間制限なし)</button>
-            <button id="play-again-button">もう一度挑戦する</button>
-        </div>
     </div>
 
     <script>
-        const GAME_DURATION_SECONDS = 60;
-        const POINTS_PER_CORRECT_ANSWER = 10;
-        const PENALTY_FOR_WRONG_ANSWER = -5;
-
-        const MAX_VALUE_EASY_NORMAL = 999999;
-        const MAX_VALUE_HARD = 999999;
-        const MIN_VALUE_HARD = 0.00001;
-        const MAX_ZERO_COUNT_IN_OPTIONS = 5;
-
-        const UNIT_DEFINITIONS = {
-            length: { name: "長さ", units: [ { name: "mm", baseFactor: 1 }, { name: "cm", baseFactor: 10 }, { name: "m", baseFactor: 1000 }, { name: "km", baseFactor: 1000000 } ], conversions: [ { from: "m", to: "km", relation: "1000m = 1km" }, { from: "km", to: "m", relation: "1km = 1000m" }, { from: "cm", to: "m", relation: "100cm = 1m" }, { from: "m", to: "cm", relation: "1m = 100cm" }, { from: "mm", to: "cm", relation: "10mm = 1cm" }, { from: "cm", to: "mm", relation: "1cm = 10mm" } ] },
-            weight: { name: "重さ", units: [ { name: "mg", baseFactor: 1 }, { name: "g", baseFactor: 1000 }, { name: "kg", baseFactor: 1000000 }, { name: "t", baseFactor: 1000000000 } ], conversions: [ { from: "g", to: "kg", relation: "1000g = 1kg" }, { from: "kg", to: "g", relation: "1kg = 1000g" }, { from: "mg", to: "g", relation: "1000mg = 1g" }, { from: "g", to: "mg", relation: "1g = 1000mg" }, { from: "kg", to: "t", relation: "1000kg = 1t" }, { from: "t", to: "kg", relation: "1t = 1000kg" } ] },
-            time: { name: "時間", units: [ { name: "秒", baseFactor: 1 }, { name: "分", baseFactor: 60 }, { name: "時間", baseFactor: 3600 }, { name: "日", baseFactor: 86400 } ], conversions: [ { from: "秒", to: "分", relation: "60秒 = 1分" }, { from: "分", to: "秒", relation: "1分 = 60秒" }, { from: "分", to: "時間", relation: "60分 = 1時間" }, { from: "時間", to: "分", relation: "1時間 = 60分" }, { from: "時間", to: "日", relation: "24時間 = 1日" }, { from: "日", to: "時間", relation: "1日 = 24時間" } ] },
-            area: { name: "面積", units: [ { name: "cm²", baseFactor: 1 }, { name: "m²", baseFactor: 10000 }, { name: "a", baseFactor: 1000000 }, { name: "ha", baseFactor: 100000000 }, { name: "km²", baseFactor: 10000000000 } ], conversions: [ { from: "cm²", to: "m²", relation: "10000cm² = 1m²" }, { from: "m²", to: "a", relation: "100m² = 1a" }, { from: "a", to: "ha", relation: "100a = 1ha" }, { from: "ha", to: "km²", relation: "100ha = 1km²" }, { from: "m²", to: "ha", relation: "10000m² = 1ha"} ] },
-            volume: { name: "かさ/容積", units: [ { name: "mL", baseFactor: 1 }, { name: "dL", baseFactor: 100 }, { name: "L", baseFactor: 1000 }, { name: "kL", baseFactor: 1000000 } ], conversions: [ { from: "mL", to: "dL", relation: "100mL = 1dL" }, { from: "dL", to: "L", relation: "10dL = 1L" }, { from: "L", to: "kL", relation: "1000L = 1kL" }, { from: "mL", to: "L", relation: "1000mL = 1L" } ] }
+        // --- データ定義 ---
+        const practiceQuestions = {
+            length: {
+                easy: [
+                    { q: '1km', a: 1000, unit: 'm', incorrects: [100, 10, 10000] },
+                    { q: '3km', a: 3000, unit: 'm', incorrects: [300, 30, 30000] },
+                    { q: '1m', a: 100, unit: 'cm', incorrects: [10, 1000, 1] },
+                    { q: '5m', a: 500, unit: 'cm', incorrects: [50, 5000, 5] },
+                    { q: '2000m', a: 2, unit: 'km', incorrects: [0.2, 20, 200] },
+                    { q: '400cm', a: 4, unit: 'm', incorrects: [0.4, 40, 4000] },
+                    { q: '7km', a: 7000, unit: 'm', incorrects: [700, 70, 70000] },
+                    { q: '9m', a: 900, unit: 'cm', incorrects: [90, 9000, 9] },
+                    { q: '6000m', a: 6, unit: 'km', incorrects: [0.6, 60, 600] },
+                    { q: '800cm', a: 8, unit: 'm', incorrects: [0.8, 80, 8000] },
+                    { q: '2km', a: 2000, unit: 'm', incorrects: [200, 20, 20000] },
+                    { q: '6m', a: 600, unit: 'cm', incorrects: [60, 6000, 6] },
+                    { q: '5000m', a: 5, unit: 'km', incorrects: [0.5, 50, 500] },
+                    { q: '300cm', a: 3, unit: 'm', incorrects: [0.3, 30, 3000] },
+                    { q: '10km', a: 10000, unit: 'm', incorrects: [1000, 100, 100000] },
+                    { q: '10m', a: 1000, unit: 'cm', incorrects: [100, 10, 10000] },
+                    { q: '7000m', a: 7, unit: 'km', incorrects: [0.7, 70, 700] },
+                    { q: '900cm', a: 9, unit: 'm', incorrects: [0.9, 90, 9000] },
+                    { q: '4km', a: 4000, unit: 'm', incorrects: [400, 40, 40000] },
+                    { q: '8m', a: 800, unit: 'cm', incorrects: [80, 8000, 8] }
+                ],
+                medium: [
+                    { q: '10km', a: 10000, unit: 'm', incorrects: [1000, 100, 100000] },
+                    { q: '20m', a: 2000, unit: 'cm', incorrects: [200, 20, 20000] },
+                    { q: '30000m', a: 30, unit: 'km', incorrects: [3, 300, 3000] },
+                    { q: '500cm', a: 5, unit: 'm', incorrects: [0.5, 50, 5000] },
+                    { q: '100km', a: 100000, unit: 'm', incorrects: [10000, 1000, 1000000] },
+                    { q: '50m', a: 5000, unit: 'cm', incorrects: [500, 50, 50000] },
+                    { q: '80000m', a: 80, unit: 'km', incorrects: [8, 800, 8000] },
+                    { q: '1200cm', a: 12, unit: 'm', incorrects: [1.2, 120, 12000] },
+                    { q: '150km', a: 150000, unit: 'm', incorrects: [15000, 1500, 1500000] },
+                    { q: '70m', a: 7000, unit: 'cm', incorrects: [700, 70, 70000] },
+                    { q: '25000m', a: 25, unit: 'km', incorrects: [2.5, 250, 2500] },
+                    { q: '3500cm', a: 35, unit: 'm', incorrects: [3.5, 350, 35000] },
+                    { q: '60km', a: 60000, unit: 'm', incorrects: [6000, 600, 600000] },
+                    { q: '90m', a: 9000, unit: 'cm', incorrects: [900, 90, 90000] },
+                    { q: '45000m', a: 45, unit: 'km', incorrects: [4.5, 450, 4500] },
+                    { q: '5500cm', a: 55, unit: 'm', incorrects: [5.5, 550, 55000] },
+                    { q: '110km', a: 110000, unit: 'm', incorrects: [11000, 1100, 1100000] },
+                    { q: '130m', a: 13000, unit: 'cm', incorrects: [1300, 130, 130000] },
+                    { q: '75000m', a: 75, unit: 'km', incorrects: [7.5, 750, 7500] },
+                    { q: '8500cm', a: 85, unit: 'm', incorrects: [8.5, 850, 85000] }
+                ],
+                hard: [
+                    { q: '1.5km', a: 1500, unit: 'm', incorrects: [150, 15, 15000] },
+                    { q: '2.3m', a: 230, unit: 'cm', incorrects: [23, 2.3, 2300] },
+                    { q: '1m 20cm', a: 120, unit: 'cm', incorrects: [12, 1020, 20] },
+                    { q: '2km 500m', a: 2500, unit: 'm', incorrects: [2005, 250, 2.5] },
+                    { q: '350cm', a: 3.5, unit: 'm', incorrects: [35, 0.35, 3500] },
+                    { q: '4500m', a: 4.5, unit: 'km', incorrects: [45, 0.45, 45000] },
+                    { q: '0.8km', a: 800, unit: 'm', incorrects: [80, 8, 8000] },
+                    { q: '5.1m', a: 510, unit: 'cm', incorrects: [51, 5.1, 5100] },
+                    { q: '3m 5cm', a: 305, unit: 'cm', incorrects: [35, 3005, 5] },
+                    { q: '0.7km 300m', a: 1000, unit: 'm', incorrects: [100, 730, 703] }, // 700+300
+                    { q: '75cm', a: 0.75, unit: 'm', incorrects: [7.5, 750, 0.075] },
+                    { q: '1200m', a: 1.2, unit: 'km', incorrects: [12, 0.12, 120] },
+                    { q: '2.05km', a: 2050, unit: 'm', incorrects: [2005, 250, 20.5] },
+                    { q: '0.9m', a: 90, unit: 'cm', incorrects: [9, 0.9, 900] },
+                    { q: '4m 50cm', a: 450, unit: 'cm', incorrects: [45, 4050, 50] },
+                    { q: '1km 200m', a: 1200, unit: 'm', incorrects: [1020, 120, 1.2] },
+                    { q: '60cm', a: 0.6, unit: 'm', incorrects: [6, 600, 0.06] },
+                    { q: '300m', a: 0.3, unit: 'km', incorrects: [3, 30, 3000] },
+                    { q: '0.1km', a: 100, unit: 'm', incorrects: [10, 1, 1000] },
+                    { q: '0.01m', a: 1, unit: 'cm', incorrects: [0.1, 10, 0.001] }
+                ]
+            },
+            weight: {
+                easy: [
+                    { q: '1kg', a: 1000, unit: 'g', incorrects: [100, 10, 10000] },
+                    { q: '4kg', a: 4000, unit: 'g', incorrects: [400, 40, 40000] },
+                    { q: '1t', a: 1000, unit: 'kg', incorrects: [100, 10, 10000] },
+                    { q: '3000g', a: 3, unit: 'kg', incorrects: [0.3, 30, 300] },
+                    { q: '5kg', a: 5000, unit: 'g', incorrects: [500, 50, 50000] },
+                    { q: '2t', a: 2000, unit: 'kg', incorrects: [200, 20, 20000] },
+                    { q: '6000g', a: 6, unit: 'kg', incorrects: [0.6, 60, 600] },
+                    { q: '4000kg', a: 4, unit: 't', incorrects: [0.4, 40, 400] },
+                    { q: '8kg', a: 8000, unit: 'g', incorrects: [800, 80, 80000] },
+                    { q: '3t', a: 3000, unit: 'kg', incorrects: [300, 30, 30000] },
+                    { q: '7000g', a: 7, unit: 'kg', incorrects: [0.7, 70, 700] },
+                    { q: '9000kg', a: 9, unit: 't', incorrects: [0.9, 90, 900] },
+                    { q: '2kg', a: 2000, unit: 'g', incorrects: [200, 20, 20000] },
+                    { q: '5t', a: 5000, unit: 'kg', incorrects: [500, 50, 50000] },
+                    { q: '1000g', a: 1, unit: 'kg', incorrects: [0.1, 10, 100] },
+                    { q: '1000kg', a: 1, unit: 't', incorrects: [0.1, 10, 100] },
+                    { q: '9kg', a: 9000, unit: 'g', incorrects: [900, 90, 90000] },
+                    { q: '6t', a: 6000, unit: 'kg', incorrects: [600, 60, 60000] },
+                    { q: '8000g', a: 8, unit: 'kg', incorrects: [0.8, 80, 800] },
+                    { q: '7000kg', a: 7, unit: 't', incorrects: [0.7, 70, 700] }
+                ],
+                medium: [
+                    { q: '20kg', a: 20000, unit: 'g', incorrects: [2000, 200, 200000] },
+                    { q: '50t', a: 50000, unit: 'kg', incorrects: [5000, 500, 500000] },
+                    { q: '40000g', a: 40, unit: 'kg', incorrects: [4, 400, 4000] },
+                    { q: '7000kg', a: 7, unit: 't', incorrects: [0.7, 70, 700] },
+                    { q: '100kg', a: 100000, unit: 'g', incorrects: [10000, 1000, 1000000] },
+                    { q: '80t', a: 80000, unit: 'kg', incorrects: [8000, 800, 800000] },
+                    { q: '120000g', a: 120, unit: 'kg', incorrects: [12, 1200, 12000] },
+                    { q: '30000kg', a: 30, unit: 't', incorrects: [3, 300, 3000] },
+                    { q: '150kg', a: 150000, unit: 'g', incorrects: [15000, 1500, 1500000] },
+                    { q: '25t', a: 25000, unit: 'kg', incorrects: [2500, 250, 250000] },
+                    { q: '55000g', a: 55, unit: 'kg', incorrects: [5.5, 550, 5500] },
+                    { q: '90000kg', a: 90, unit: 't', incorrects: [9, 900, 9000] },
+                    { q: '200kg', a: 200000, unit: 'g', incorrects: [20000, 2000, 2000000] },
+                    { q: '110t', a: 110000, unit: 'kg', incorrects: [11000, 1100, 1100000] },
+                    { q: '75000g', a: 75, unit: 'kg', incorrects: [7.5, 750, 7500] },
+                    { q: '60000kg', a: 60, unit: 't', incorrects: [6, 600, 6000] },
+                     { q: '30kg', a: 30000, unit: 'g', incorrects: [3000, 300, 300000] },
+                    { q: '40t', a: 40000, unit: 'kg', incorrects: [4000, 400, 400000] },
+                    { q: '85000g', a: 85, unit: 'kg', incorrects: [8.5, 850, 8500] },
+                    { q: '120000kg', a: 120, unit: 't', incorrects: [12, 1200, 12000] }
+                ],
+                hard: [
+                    { q: '2.5kg', a: 2500, unit: 'g', incorrects: [250, 25, 25000] },
+                    { q: '1.2t', a: 1200, unit: 'kg', incorrects: [120, 12, 12000] },
+                    { q: '1kg 300g', a: 1300, unit: 'g', incorrects: [130, 1003, 300] },
+                    { q: '2t 50kg', a: 2050, unit: 'kg', incorrects: [250, 2005, 50] },
+                    { q: '800g', a: 0.8, unit: 'kg', incorrects: [8, 80, 8000] },
+                    { q: '500kg', a: 0.5, unit: 't', incorrects: [5, 50, 5000] },
+                    { q: '3.05kg', a: 3050, unit: 'g', incorrects: [305, 350, 3.5] },
+                    { q: '0.8t', a: 800, unit: 'kg', incorrects: [80, 8, 8000] },
+                    { q: '5kg 20g', a: 5020, unit: 'g', incorrects: [520, 5002, 20] },
+                    { q: '1t 500kg', a: 1500, unit: 'kg', incorrects: [1050, 150, 1.5] },
+                    { q: '150g', a: 0.15, unit: 'kg', incorrects: [1.5, 15, 1500] },
+                    { q: '250kg', a: 0.25, unit: 't', incorrects: [2.5, 25, 2500] },
+                    { q: '0.05kg', a: 50, unit: 'g', incorrects: [5, 0.5, 500] },
+                    { q: '0.001t', a: 1, unit: 'kg', incorrects: [0.1, 10, 100] },
+                    { q: '7kg 7g', a: 7007, unit: 'g', incorrects: [707, 77, 7070] },
+                    { q: '3t 300kg', a: 3300, unit: 'kg', incorrects: [3030, 330, 3.3] },
+                    { q: '450g', a: 0.45, unit: 'kg', incorrects: [4.5, 45, 4500] },
+                    { q: '750kg', a: 0.75, unit: 't', incorrects: [7.5, 75, 7500] },
+                    { q: '0.1kg', a: 100, unit: 'g', incorrects: [10, 1, 1000] },
+                    { q: '0.1t', a: 100, unit: 'kg', incorrects: [10, 1000, 10000] }
+                ]
+            },
+            volume: {
+                easy: [
+                    { q: '1L', a: 1000, unit: 'mL', incorrects: [100, 10, 10000] },
+                    { q: '2L', a: 20, unit: 'dL', incorrects: [2, 0.2, 200] },
+                    { q: '1L', a: 10, unit: 'dL', incorrects: [1, 100, 1000] },
+                    { q: '3dL', a: 300, unit: 'mL', incorrects: [30, 3, 3000] },
+                    { q: '2000mL', a: 2, unit: 'L', incorrects: [0.2, 20, 200] },
+                    { q: '50dL', a: 5, unit: 'L', incorrects: [0.5, 500, 5000] },
+                    { q: '5L', a: 5000, unit: 'mL', incorrects: [500, 50, 50000] },
+                    { q: '8L', a: 80, unit: 'dL', incorrects: [8, 0.8, 800] },
+                    { q: '6dL', a: 600, unit: 'mL', incorrects: [60, 6, 6000] },
+                    { q: '4000mL', a: 4, unit: 'L', incorrects: [0.4, 40, 400] },
+                    { q: '70dL', a: 7, unit: 'L', incorrects: [0.7, 700, 7000] },
+                    { q: '3L', a: 3000, unit: 'mL', incorrects: [300, 30, 30000] },
+                    { q: '12dL', a: 1200, unit: 'mL', incorrects: [120, 12, 12000] },
+                    { q: '9000mL', a: 9, unit: 'L', incorrects: [0.9, 90, 900] },
+                    { q: '1L 5dL', a: 15, unit: 'dL', incorrects: [10.5, 1.5, 150] },
+                    { q: '1L 500mL', a: 1500, unit: 'mL', incorrects: [150, 1005, 500] },
+                    { q: '300mL', a: 3, unit: 'dL', incorrects: [0.3, 30, 3000] },
+                    { q: '400mL', a: 0.4, unit: 'L', incorrects: [4, 40, 4000] },
+                    { q: '2dL', a: 200, unit: 'mL', incorrects: [20, 2, 2000] },
+                    { q: '6L', a: 60, unit: 'dL', incorrects: [6, 0.6, 600] }
+                ],
+                medium: [
+                    { q: '30L', a: 30000, unit: 'mL', incorrects: [3000, 300, 300000] },
+                    { q: '40dL', a: 4, unit: 'L', incorrects: [0.4, 400, 4000] },
+                    { q: '6000mL', a: 60, unit: 'dL', incorrects: [6, 600, 6000] },
+                    { q: '15L', a: 15000, unit: 'mL', incorrects: [1500, 150, 150000] },
+                    { q: '70dL', a: 7, unit: 'L', incorrects: [0.7, 700, 7000] },
+                    { q: '8000mL', a: 80, unit: 'dL', incorrects: [8, 800, 8000] },
+                    { q: '50L', a: 50000, unit: 'mL', incorrects: [5000, 500, 500000] },
+                    { q: '100dL', a: 10, unit: 'L', incorrects: [1, 1000, 10000] },
+                    { q: '15000mL', a: 150, unit: 'dL', incorrects: [15, 1500, 15000] },
+                    { q: '25L', a: 25000, unit: 'mL', incorrects: [2500, 250, 250000] },
+                    { q: '35000mL', a: 350, unit: 'dL', incorrects: [35, 3500, 35000] },
+                    { q: '65dL', a: 6.5, unit: 'L', incorrects: [65, 650, 0.65] },
+                    { q: '8500mL', a: 85, unit: 'dL', incorrects: [8.5, 850, 8500] },
+                    { q: '120dL', a: 12, unit: 'L', incorrects: [1.2, 1200, 12000] },
+                    { q: '50000mL', a: 50, unit: 'L', incorrects: [5, 500, 5000] },
+                    { q: '20000mL', a: 200, unit: 'dL', incorrects: [20, 2000, 20000] },
+                    { q: '90dL', a: 9, unit: 'L', incorrects: [0.9, 900, 9000] },
+                    { q: '75000mL', a: 75, unit: 'L', incorrects: [7.5, 750, 7500] },
+                    { q: '110dL', a: 11, unit: 'L', incorrects: [1.1, 1100, 11000] },
+                    { q: '13000mL', a: 130, unit: 'dL', incorrects: [13, 1300, 13000] }
+                ],
+                hard: [
+                    { q: '1.5L', a: 1500, unit: 'mL', incorrects: [150, 15, 15000] },
+                    { q: '0.8L', a: 8, unit: 'dL', incorrects: [0.8, 80, 800] },
+                    { q: '1L 2dL', a: 12, unit: 'dL', incorrects: [10.2, 1.2, 120] },
+                    { q: '2L 50mL', a: 2050, unit: 'mL', incorrects: [250, 2005, 2.5] },
+                    { q: '250mL', a: 0.25, unit: 'L', incorrects: [2.5, 25, 2500] },
+                    { q: '5dL', a: 0.5, unit: 'L', incorrects: [5, 50, 500] },
+                    { q: '3.02L', a: 3020, unit: 'mL', incorrects: [302, 3002, 3.2] },
+                    { q: '0.1L', a: 1, unit: 'dL', incorrects: [0.1, 10, 100] },
+                    { q: '4dL 50mL', a: 450, unit: 'mL', incorrects: [45, 405, 50] },
+                    { q: '0.7L 3dL', a: 10, unit: 'dL', incorrects: [7.3, 73, 703] },
+                    { q: '75mL', a: 0.075, unit: 'L', incorrects: [0.75, 7.5, 750] },
+                    { q: '120mL', a: 1.2, unit: 'dL', incorrects: [12, 0.12, 1200] },
+                    { q: '5.5L', a: 5500, unit: 'mL', incorrects: [550, 55, 55000] },
+                    { q: '0.6L', a: 6, unit: 'dL', incorrects: [0.06, 60, 600] },
+                    { q: '1L 10mL', a: 1010, unit: 'mL', incorrects: [110, 1001, 1.1] },
+                    { q: '2dL 5mL', a: 205, unit: 'mL', incorrects: [25, 2005, 2.5] },
+                    { q: '350mL', a: 3.5, unit: 'dL', incorrects: [35, 0.35, 3500] },
+                    { q: '800mL', a: 0.8, unit: 'L', incorrects: [8, 80, 8000] },
+                    { q: '1.05L', a: 1050, unit: 'mL', incorrects: [150, 1005, 1.5] },
+                    { q: '0.01L', a: 1, unit: 'cL', incorrects: [0.1, 10, 100] }
+                ]
+            },
+             time: {
+                easy: [
+                    { q: '1分', a: 60, unit: '秒', incorrects: [1, 10, 6] },
+                    { q: '3分', a: 180, unit: '秒', incorrects: [30, 300, 1800] },
+                    { q: '1時間', a: 60, unit: '分', incorrects: [1, 10, 600] },
+                    { q: '120秒', a: 2, unit: '分', incorrects: [1.2, 12, 20] },
+                    { q: '180分', a: 3, unit: '時間', incorrects: [1.8, 18, 30] },
+                    { q: '5分', a: 300, unit: '秒', incorrects: [50, 5, 3000] },
+                    { q: '2時間', a: 120, unit: '分', incorrects: [20, 2, 1200] },
+                    { q: '300秒', a: 5, unit: '分', incorrects: [3, 30, 0.5] },
+                    { q: '240分', a: 4, unit: '時間', incorrects: [2.4, 24, 40] },
+                    { q: '10分', a: 600, unit: '秒', incorrects: [100, 60, 6000] },
+                    { q: '4時間', a: 240, unit: '分', incorrects: [40, 4, 2400] },
+                    { q: '60秒', a: 1, unit: '分', incorrects: [0.6, 6, 10] },
+                    { q: '60分', a: 1, unit: '時間', incorrects: [0.6, 6, 10] },
+                    { q: '7分', a: 420, unit: '秒', incorrects: [70, 42, 4200] },
+                    { q: '5時間', a: 300, unit: '分', incorrects: [50, 5, 3000] },
+                    { q: '420秒', a: 7, unit: '分', incorrects: [4.2, 42, 70] },
+                    { q: '360分', a: 6, unit: '時間', incorrects: [3.6, 36, 60] },
+                    { q: '8分', a: 480, unit: '秒', incorrects: [80, 48, 4800] },
+                    { q: '9時間', a: 540, unit: '分', incorrects: [90, 9, 5400] },
+                    { q: '540秒', a: 9, unit: '分', incorrects: [5.4, 54, 90] }
+                ],
+                medium: [
+                    { q: '10分', a: 600, unit: '秒', incorrects: [100, 60, 6000] },
+                    { q: '2時間', a: 120, unit: '分', incorrects: [20, 2, 1200] },
+                    { q: '360秒', a: 6, unit: '分', incorrects: [3.6, 36, 60] },
+                    { q: '15分', a: 900, unit: '秒', incorrects: [150, 90, 9000] },
+                    { q: '3時間', a: 180, unit: '分', incorrects: [30, 3, 1800] },
+                    { q: '540秒', a: 9, unit: '分', incorrects: [5.4, 54, 90] },
+                    { q: '45分', a: 2700, unit: '秒', incorrects: [450, 270, 27000] },
+                    { q: '6時間', a: 360, unit: '分', incorrects: [60, 6, 3600] },
+                    { q: '900秒', a: 15, unit: '分', incorrects: [9, 90, 1.5] },
+                    { q: '20分', a: 1200, unit: '秒', incorrects: [200, 120, 12000] },
+                    { q: '8時間', a: 480, unit: '分', incorrects: [80, 8, 4800] },
+                    { q: '1200秒', a: 20, unit: '分', incorrects: [12, 120, 2] },
+                    { q: '30分', a: 1800, unit: '秒', incorrects: [300, 180, 18000] },
+                    { q: '10時間', a: 600, unit: '分', incorrects: [100, 10, 6000] },
+                    { q: '2700秒', a: 45, unit: '分', incorrects: [27, 270, 4.5] },
+                    { q: '1時間30分', a: 90, unit: '分', incorrects: [130, 1.3, 900] },
+                    { q: '2分30秒', a: 150, unit: '秒', incorrects: [230, 2.3, 120] },
+                    { q: '720分', a: 12, unit: '時間', incorrects: [7.2, 72, 1.2] },
+                    { q: '3600秒', a: 60, unit: '分', incorrects: [36, 360, 6] },
+                    { q: '1440分', a: 24, unit: '時間', incorrects: [14.4, 144, 2.4] }
+                ],
+                hard: [
+                    { q: '1.5分', a: 90, unit: '秒', incorrects: [15, 150, 1.5] },
+                    { q: '2.5時間', a: 150, unit: '分', incorrects: [25, 2.5, 1500] },
+                    { q: '1分15秒', a: 75, unit: '秒', incorrects: [115, 1.15, 60] },
+                    { q: '1時間10分', a: 70, unit: '分', incorrects: [110, 1.1, 60] },
+                    { q: '100秒', a: '1分40秒', unit: '', incorrects: ['1分0秒', '10分0秒', '1分60秒'] },
+                    { q: '75分', a: '1時間15分', unit: '', incorrects: ['1時間25分', '1時間5分', '7時間5分'] },
+                    { q: '0.5分', a: 30, unit: '秒', incorrects: [5, 50, 0.05] },
+                    { q: '0.75時間', a: 45, unit: '分', incorrects: [7.5, 0.75, 450] },
+                    { q: '3分5秒', a: 185, unit: '秒', incorrects: [35, 305, 180] },
+                    { q: '2時間5分', a: 125, unit: '分', incorrects: [205, 2.5, 120] },
+                    { q: '200秒', a: '3分20秒', unit: '', incorrects: ['2分0秒', '3分0秒', '2分80秒'] },
+                    { q: '100分', a: '1時間40分', unit: '', incorrects: ['1時間0分', '1時間60分', '10時間0分'] },
+                    { q: '1.2分', a: 72, unit: '秒', incorrects: [12, 120, 7.2] },
+                    { q: '3.1時間', a: 186, unit: '分', incorrects: [31, 310, 180] },
+                    { q: '4分4秒', a: 244, unit: '秒', incorrects: [44, 404, 240] },
+                    { q: '3時間30分', a: 210, unit: '分', incorrects: [330, 3.3, 180] },
+                    { q: '90秒', a: '1分30秒', unit: '', incorrects: ['1分0秒', '1分90秒', '0分90秒'] },
+                    { q: '150分', a: '2時間30分', unit: '', incorrects: ['2時間0分', '2時間50分', '1時間50分'] },
+                    { q: '0.1時間', a: 6, unit: '分', incorrects: [1, 10, 60] },
+                    { q: '0.1分', a: 6, unit: '秒', incorrects: [0.1, 1, 10] }
+                ]
+            },
+            area: {
+                easy: [
+                    { q: '1㎡', a: 10000, unit: '㎠', incorrects: [100, 1000, 100000] },
+                    { q: '1k㎡', a: 1000000, unit: '㎡', incorrects: [1000, 10000, 10000000] },
+                    { q: '20000㎠', a: 2, unit: '㎡', incorrects: [0.2, 20, 200] },
+                    { q: '3k㎡', a: 3000000, unit: '㎡', incorrects: [3000, 30000, 30000000] },
+                    { q: '50000㎠', a: 5, unit: '㎡', incorrects: [0.5, 50, 500] },
+                    { q: '1000000㎡', a: 1, unit: 'k㎡', incorrects: [0.1, 10, 100] },
+                    { q: '5㎡', a: 50000, unit: '㎠', incorrects: [500, 5000, 500000] },
+                    { q: '2k㎡', a: 2000000, unit: '㎡', incorrects: [2000, 20000, 20000000] },
+                    { q: '80000㎠', a: 8, unit: '㎡', incorrects: [0.8, 80, 800] },
+                    { q: '4k㎡', a: 4000000, unit: '㎡', incorrects: [4000, 40000, 40000000] },
+                    { q: '10㎡', a: 100000, unit: '㎠', incorrects: [1000, 10000, 1000000] },
+                    { q: '10k㎡', a: 10000000, unit: '㎡', incorrects: [10000, 100000, 100000000] },
+                    { q: '100000㎠', a: 10, unit: '㎡', incorrects: [1, 100, 1000] },
+                    { q: '5000000㎡', a: 5, unit: 'k㎡', incorrects: [0.5, 50, 500] },
+                    { q: '3㎡', a: 30000, unit: '㎠', incorrects: [300, 3000, 300000] },
+                    { q: '6k㎡', a: 6000000, unit: '㎡', incorrects: [6000, 60000, 60000000] },
+                    { q: '200000㎠', a: 20, unit: '㎡', incorrects: [2, 200, 2000] },
+                    { q: '8000000㎡', a: 8, unit: 'k㎡', incorrects: [0.8, 80, 800] },
+                    { q: '4㎡', a: 40000, unit: '㎠', incorrects: [400, 4000, 400000] },
+                    { q: '9k㎡', a: 9000000, unit: '㎡', incorrects: [9000, 90000, 90000000] }
+                ],
+                medium: [
+                    { q: '10㎡', a: 100000, unit: '㎠', incorrects: [10000, 1000, 1000000] },
+                    { q: '30k㎡', a: 30000000, unit: '㎡', incorrects: [30000, 300000, 300000000] },
+                    { q: '1a', a: 100, unit: '㎡', incorrects: [10, 1000, 10000] },
+                    { q: '1ha', a: 10000, unit: '㎡', incorrects: [100, 1000, 100000] },
+                    { q: '500000㎠', a: 50, unit: '㎡', incorrects: [5, 500, 5000] },
+                    { q: '25000000㎡', a: 25, unit: 'k㎡', incorrects: [2.5, 250, 2500] },
+                    { q: '5a', a: 500, unit: '㎡', incorrects: [50, 5000, 50000] },
+                    { q: '3ha', a: 30000, unit: '㎡', incorrects: [300, 3000, 300000] },
+                    { q: '1200000㎠', a: 120, unit: '㎡', incorrects: [12, 1200, 12000] },
+                    { q: '75000000㎡', a: 75, unit: 'k㎡', incorrects: [7.5, 750, 7500] },
+                    { q: '10a', a: 1000, unit: '㎡', incorrects: [100, 10000, 100000] },
+                    { q: '5ha', a: 50000, unit: '㎡', incorrects: [500, 5000, 500000] },
+                    { q: '20a', a: 2000, unit: '㎡', incorrects: [200, 20000, 200000] },
+                    { q: '8ha', a: 80000, unit: '㎡', incorrects: [800, 8000, 800000] },
+                    { q: '1000000㎠', a: 100, unit: '㎡', incorrects: [10, 1000, 10000] },
+                    { q: '50a', a: 5000, unit: '㎡', incorrects: [500, 50000, 500000] },
+                    { q: '12ha', a: 120000, unit: '㎡', incorrects: [1200, 12000, 1200000] },
+                    { q: '200000㎠', a: 200, unit: '㎡', incorrects: [20, 2000, 20000] },
+                    { q: '70a', a: 7000, unit: '㎡', incorrects: [700, 70000, 700000] },
+                    { q: '15ha', a: 150000, unit: '㎡', incorrects: [1500, 15000, 1500000] }
+                ],
+                hard: [
+                    { q: '1.5㎡', a: 15000, unit: '㎠', incorrects: [1500, 150, 150000] },
+                    { q: '0.5k㎡', a: 500000, unit: '㎡', incorrects: [50000, 5000, 5000000] },
+                    { q: '1a', a: 100, unit: '㎡', incorrects: [10, 1000, 10000] },
+                    { q: '1ha', a: 10000, unit: '㎡', incorrects: [100, 1000, 100000] },
+                    { q: '0.1a', a: 10, unit: '㎡', incorrects: [1, 100, 1000] },
+                    { q: '0.1ha', a: 1000, unit: '㎡', incorrects: [100, 10000, 100000] },
+                    { q: '1.2a', a: 120, unit: '㎡', incorrects: [12, 1200, 12000] },
+                    { q: '2.5ha', a: 25000, unit: '㎡', incorrects: [2500, 250, 250000] },
+                    { q: '50㎠', a: 0.005, unit: '㎡', incorrects: [0.05, 0.5, 5] },
+                    { q: '300㎡', a: 0.03, unit: 'ha', incorrects: [0.3, 3, 30] },
+                     { q: '1k㎡', a: 100, unit: 'ha', incorrects: [10, 1000, 10000] },
+                    { q: '1ha', a: 100, unit: 'a', incorrects: [10, 1000, 10000] },
+                    { q: '0.01k㎡', a: 1, unit: 'ha', incorrects: [0.1, 10, 100] },
+                    { q: '0.01ha', a: 1, unit: 'a', incorrects: [0.1, 10, 100] },
+                    { q: '20a', a: 0.2, unit: 'ha', incorrects: [2, 20, 200] },
+                    { q: '500a', a: 5, unit: 'ha', incorrects: [0.5, 50, 500] },
+                    { q: '3.5a', a: 350, unit: '㎡', incorrects: [35, 3.5, 3500] },
+                    { q: '0.8ha', a: 8000, unit: '㎡', incorrects: [800, 80, 80000] },
+                    { q: '150000㎡', a: 15, unit: 'ha', incorrects: [1.5, 150, 1500] },
+                    { q: '2000000㎡', a: 2, unit: 'k㎡', incorrects: [0.2, 20, 200] }
+                ]
+            }
         };
+        const senseQuestions = {
+            length: [
+                { q: 'きみの学校のプールの長さは、だいたいどのくらいかな？', a: '25m', incorrects: ['25cm', '25km', '250m'] },
+                { q: 'つまようじ1本の長さは、だいたいどのくらい？', a: '6cm', incorrects: ['6mm', '6m', '60cm'] },
+                { q: 'トイレットペーパー1個分の長さは、だいたいどのくらい？', a: '30m', incorrects: ['30cm', '3m', '300m'] },
+                { q: '消しゴムの短い辺の長さは、だいたいどのくらい？', a: '2cm', incorrects: ['2mm', '0.2cm', '20cm'] },
+                { q: 'ランリュックの横はばは、だいたいどのくらい？', a: '30cm', incorrects: ['3cm', '3m', '0.3cm'] },
+                { q: '教室のたての長さは、だいたいどのくらい？', a: '8m', incorrects: ['8cm', '80m', '0.8m'] },
+                { q: '東京から大阪までのきょりは、だいたいどのくらい？', a: '500km', incorrects: ['500m', '50km', '5000km'] },
+                { q: '身長1m は、だいたいどのくらいの高さ？', a: '小学3〜4年生のむねの高さ', incorrects: ['大人の人の頭の上', 'えんぴつくらいの高さ', '車の長さ'] },
+                { q: '1mm の例として正しいのは？', a: 'シャープペンのしんの太さ', incorrects: ['ボールペンの長さ', 'ノートのあつさ', 'きみの身長'] },
+                { q: '1km の例として正しいのは？', a: '歩いて15分くらいのきょり', incorrects: ['学校のろうかの長さ', 'となり町までのきょり', '日本からアメリカまでのきょり'] },
+                { q: '1cm の例として正しいのは？', a: '小指のつめの幅', incorrects: ['人さし指の長さ', '本のあつさ', 'きみの身長'] },
+                { q: '1m の例として正しいのは？', a: '大人の人がりょう手を広げたくらい', incorrects: ['ボールペンの長さ', 'きみの身長の半分', '教室のたての長さ'] },
+                { q: '小学校のてつぼうの高さは、だいたいどのくらい？', a: '1.2m', incorrects: ['12cm', '12m', '0.12m'] },
+                { q: '家から学校までのきょりは、だいたいどのくらい？', a: '1km', incorrects: ['10m', '100m', '10cm'] },
+                { q: '日本のいちばん長い島の長さは、だいたいどのくらい？', a: '3000km', incorrects: ['300km', '3000m', '30000km'] },
+                { q: '教科書1さつのあつさは、だいたいどのくらい？', a: '1cm', incorrects: ['1mm', '10cm', '0.1mm'] },
+                { q: '消しゴムの長い辺の長さは、だいたいどのくらい？', a: '4cm', incorrects: ['4mm', '40cm', '0.4cm'] },
+                { q: 'サッカーボールの直径は、だいたいどのくらい？', a: '22cm', incorrects: ['22mm', '2.2cm', '2.2m'] },
+                { q: '日本でいちばん高い山（富士山）の高さは、だいたいどのくらい？', a: '3776m', incorrects: ['3776cm', '3776km', '377.6m'] },
+                { q: 'はがき1枚のたての長さは、だいたいどのくらい？', a: '15cm', incorrects: ['1.5cm', '15mm', '150cm'] }
+            ],
+            weight: [
+                { q: '5円玉1まいの重さは、だいたいどのくらい？', a: '3.75g', incorrects: ['37.5g', '0.375g', '375g'] },
+                { q: '牛乳パック1本（1L）の重さは、だいたいどのくらい？', a: '1kg', incorrects: ['1g', '10kg', '100g'] },
+                { q: '小学校1年生の重さは、だいたいどのくらい？', a: '20kg', incorrects: ['2kg', '200g', '200kg'] },
+                { q: 'ティッシュペーパー1箱の重さは、だいたいどのくらい？', a: '200g', incorrects: ['20g', '2kg', '20g'] },
+                { q: '1円玉1まいの重さは、だいたいどのくらい？', a: '1g', incorrects: ['0.1g', '10g', '1kg'] },
+                { q: '大型のゾウの重さは、だいたいどのくらい？', a: '5t', incorrects: ['500kg', '50kg', '50t'] },
+                { q: '教科書1さつの重さは、だいたいどのくらい？', a: '500g', incorrects: ['50g', '5kg', '5000g'] },
+                { q: 'バケツいっぱいの水の重さは、だいたいどのくらい？', a: '10kg', incorrects: ['1kg', '100kg', '10g'] },
+                { q: '消しゴム1個の重さは、だいたいどのくらい？', a: '10g', incorrects: ['1g', '100g', '1kg'] },
+                { q: 'お米1袋（5kg）の重さは、だいたいどのくらい？', a: '5kg', incorrects: ['500g', '50kg', '0.5kg'] },
+                { q: '小学校の先生の重さは、だいたいどのくらい？', a: '60kg', incorrects: ['6kg', '600kg', '60g'] },
+                { q: '車1台の重さは、だいたいどのくらい？', a: '1t', incorrects: ['100kg', '10t', '1000g'] },
+                { q: 'クリップ1個の重さは、だいたいどのくらい？', a: '0.5g', incorrects: ['5g', '0.05g', '50g'] },
+                { q: 'リンゴ1個の重さは、だいたいどのくらい？', a: '300g', incorrects: ['30g', '3kg', '3000g'] },
+                { q: '猫1ぴきの重さは、だいたいどのくらい？', a: '4kg', incorrects: ['400g', '40kg', '0.4kg'] },
+                { q: '野球のボールの重さは、だいたいどのくらい？', a: '150g', incorrects: ['15g', '1.5kg', '1500g'] },
+                { q: '力士1人の重さは、だいたいどのくらい？', a: '150kg', incorrects: ['15kg', '1.5t', '150g'] },
+                { q: 'スプーン1杯の砂糖の重さは、だいたいどのくらい？', a: '4g', incorrects: ['0.4g', '40g', '0.04g'] },
+                { q: '小学生のランドセルの重さは、だいたいどのくらい？', a: '1kg', incorrects: ['100g', '5kg', '10kg'] },
+                { q: '日本で一番重いカブトムシは、だいたいどのくらい？', a: '100g', incorrects: ['10g', '1kg', '1000g'] }
+            ],
+            volume: [
+                { q: '計量スプーン（大さじ）1ぱいは、だいたいどのくらい？', a: '15mL', incorrects: ['1.5mL', '150mL', '1dL'] },
+                { q: '給食で出てくる牛乳びん1本は、だいたいどのくらい？', a: '200mL', incorrects: ['20mL', '2L', '0.2mL'] },
+                { q: 'おうちのおふろにお湯をためると、だいたいどのくらい？', a: '200L', incorrects: ['20L', '200mL', '2000L'] },
+                { q: 'コップ1ぱいの水の量は、だいたいどのくらい？', a: '200mL', incorrects: ['20mL', '2L', '200dL'] },
+                { q: 'ペットボトル（小さいサイズ）1本の量は、だいたいどのくらい？', a: '500mL', incorrects: ['50mL', '5L', '0.05L'] },
+                { q: '1dL の例として正しいのは？', a: '紙コップ1ぱい', incorrects: ['牛乳パック1本', 'ペットボトル1本', '計量スプーン1ぱい'] },
+                { q: '1L の例として正しいのは？', a: '牛乳パック1本', incorrects: ['コップ1ぱい', 'バケツ1ぱい', 'おふろ1つ'] },
+                { q: 'おちょこ1ぱいの量は、だいたいどのくらい？', a: '20mL', incorrects: ['2mL', '200mL', '0.2L'] },
+                { q: '金魚ばちに入る水の量は、だいたいどのくらい？', a: '5L', incorrects: ['500mL', '50L', '0.5L'] },
+                { q: '味噌汁のおわん1つ分の量は、だいたいどのくらい？', a: '150mL', incorrects: ['15mL', '1.5L', '15dL'] },
+                { q: 'ペットボトル（大きいサイズ）1本の量は、だいたいどのくらい？', a: '2L', incorrects: ['200mL', '20L', '20dL'] },
+                { q: '水たまり1つ分の水は、だいたいどのくらい？', a: '50mL', incorrects: ['5mL', '0.5L', '5L'] },
+                { q: '水筒に入る水の量は、だいたいどのくらい？', a: '800mL', incorrects: ['80mL', '8L', '8dL'] },
+                { q: 'コーヒーカップ1ぱいの量は、だいたいどのくらい？', a: '180mL', incorrects: ['18mL', '1.8L', '18dL'] },
+                { q: 'バケツ1つに入る水の量は、だいたいどのくらい？', a: '10L', incorrects: ['1L', '100mL', '100L'] },
+                { q: '雨つぶ1つの量は、だいたいどのくらい？', a: '0.1mL', incorrects: ['1mL', '0.01mL', '1L'] },
+                { q: 'プールに入る水の量は、だいたいどのくらい？', a: '200kL', incorrects: ['200L', '200mL', '2000kL'] } // kLも感覚として
+            ],
+            time: [
+                { q: 'カップラーメンができるのを待つ時間は、だいたいどのくらい？', a: '3分', incorrects: ['30秒', '10分', '30分'] },
+                { q: '授業時間（小学校）は、だいたいどのくらい？', a: '45分', incorrects: ['15分', '60分', '90分'] },
+                { q: '1日は、何時間？', a: '24時間', incorrects: ['12時間', '36時間', '10時間'] },
+                { q: 'まばたき1回にかかる時間は、だいたいどのくらい？', a: '0.1秒', incorrects: ['1秒', '0.01秒', '1分'] },
+                { q: '心臓が1回ドキドキする時間は、だいたいどのくらい？', a: '1秒', incorrects: ['0.1秒', '1分', '1時間'] },
+                { q: '夜、ねむる時間は、だいたいどのくらい？', a: '8時間', incorrects: ['3時間', '12時間', '1時間'] },
+                { q: '運動会のかけっこ（50m）にかかる時間は、だいたいどのくらい？', a: '10秒', incorrects: ['1秒', '1分', '30秒'] },
+                { q: '歯をみがく時間は、だいたいどのくらい？', a: '3分', incorrects: ['30秒', '1分', '10分'] },
+                { q: '1秒間の例として正しいのは？', a: '心臓が1回ドキドキする時間', incorrects: ['まばたき1回にかかる時間', 'カップラーメンができるのを待つ時間', '授業時間'] },
+                { q: '1分間の例として正しいのは？', a: 'カップラーメンができるのを待つ時間', incorrects: ['授業時間', '夜ねむる時間', 'まばたき1回にかかる時間'] },
+                { q: '1時間の例として正しいのは？', a: '授業時間より少し長い時間', incorrects: ['夜ねむる時間', 'まばたき1回にかかる時間', '歯をみがく時間'] },
+                { q: '1日の例として正しいのは？', a: '朝おきてから夜ねむるまで+ねむる時間', incorrects: ['授業が全部終わるまで', '学校にいる時間', '1週間の時間'] },
+                { q: 'アニメ番組1本の長さは、だいたいどのくらい？', a: '30分', incorrects: ['15分', '1時間', '10分'] },
+                { q: '1週間は、どのくらい？', a: '7日', incorrects: ['3日', '10日', '1ヶ月'] },
+                { q: '1ヶ月は、だいたいどのくらい？', a: '30日', incorrects: ['7日', '50日', '100日'] },
+                { q: '1年は、だいたいどのくらい？', a: '365日', incorrects: ['30日', '100日', '500日'] },
+                { q: '地球が太陽のまわりを一周する時間は、だいたいどのくらい？', a: '1年', incorrects: ['1日', '1ヶ月', '1時間'] },
+                { q: '地球が自分でぐるっと一周する時間は、だいたいどのくらい？', a: '1日', incorrects: ['1時間', '1分', '1年'] },
+                { q: '宇宙飛行士が地球のまわりを一周する時間は、だいたいどのくらい？', a: '90分', incorrects: ['9分', '9時間', '90秒'] }
+            ],
+            area: [
+                { q: 'B5サイズのノートを広げた広さは、だいたいどのくらい？', a: '900㎠', incorrects: ['90㎠', '9000㎠', '90㎡'] },
+                { q: '小学校の教室の広さは、だいたいどのくらい？', a: '64㎡', incorrects: ['6.4㎡', '640㎡', '6400㎡'] },
+                { q: '1a は、だいたいどのくらいの広さ？', a: '10m × 10m の正方形の広さ', incorrects: ['1m × 1m の広さ', '100m × 100m の広さ', '1km × 1km の広さ'] },
+                { q: '1ha は、だいたいどのくらいの広さ？', a: '小学校のグラウンドの広さ', incorrects: ['教室の広さ', '東京ドームの広さ', '日本の面積'] },
+                { q: 'はがき1枚の広さは、だいたいどのくらい？', a: '150㎠', incorrects: ['15㎠', '1500㎠', '15㎠'] }, // 10cm x 14.8cm ≒ 150㎠
+                { q: 'たたみ1じょうの広さは、だいたいどのくらい？', a: '1.65㎡', incorrects: ['16.5㎡', '0.165㎡', '165㎡'] },
+                { q: '東京ドームの広さは、だいたいどのくらい？', a: '4.7ha', incorrects: ['47ha', '0.47ha', '470ha'] },
+                { q: '消しゴムの底面の広さは、だいたいどのくらい？', a: '8㎠', incorrects: ['0.8㎠', '80㎠', '8㎡'] },
+                { q: 'A4コピー用紙1枚の広さは、だいたいどのくらい？', a: '625㎠', incorrects: ['62.5㎠', '6250㎠', '6.25㎡'] },
+                { q: '日本の面積は、だいたいどのくらい？', a: '38万k㎡', incorrects: ['38万㎡', '380k㎡', '3800k㎡'] },
+                { q: 'サッカー場1面の広さは、だいたいどのくらい？', a: '0.7ha', incorrects: ['7ha', '0.07ha', '70ha'] },
+                { q: 'テニスコート（シングルス）の広さは、だいたいどのくらい？', a: '260㎡', incorrects: ['26㎡', '2600㎡', '2.6㎡'] },
+                { q: 'バスケットボール場1面の広さは、だいたいどのくらい？', a: '420㎡', incorrects: ['42㎡', '4200㎡', '4.2㎡'] },
+                { q: '日本で一番大きい湖（琵琶湖）の広さは、だいたいどのくらい？', a: '670k㎡', incorrects: ['67k㎡', '6.7k㎡', '6700k㎡'] },
+                { q: '学校の体育館の広さは、だいたいどのくらい？', a: '800㎡', incorrects: ['80㎡', '8000㎡', '8k㎡'] },
+                { q: '100㎠ は、だいたいどのくらいの広さ？', a: '10cm × 10cm の正方形の広さ', incorrects: ['1cm × 1cm の広さ', '1m × 1m の広さ', '1mm × 1mm の広さ'] },
+                { q: '50㎡ は、だいたいどのくらいの広さ？', a: '小学校の教室より少しせまい広さ', incorrects: ['たたみ1じょうの広さ', 'サッカー場1面の広さ', '東京ドームの広さ'] },
+                { q: '1k㎡ は、だいたいどのくらいの広さ？', a: '歩いて15分くらいの正方形の広さ', incorrects: ['教室の広さ', '学校のグラウンドの広さ', '東京ドームの広さ'] },
+                { q: 'ハトスタジアムのグラウンドの広さは、だいたいどのくらい？', a: '1ha', incorrects: ['10ha', '0.1ha', '100ha'] },
+                { q: '切手1枚の広さは、だいたいどのくらい？', a: '4㎠', incorrects: ['0.4㎠', '40㎠', '0.04㎠'] }
+            ]
+        };
+        const unitNames = { length: '長さ', weight: '重さ', volume: 'かさ', time: '時間', area: '面積' };
+        const levelNames = { easy: '初級', medium: '中級', hard: '上級' };
 
-        const categorySelectionScreen = document.getElementById('category-selection-screen');
-        const difficultySelectionScreen = document.getElementById('difficulty-selection-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const resultsScreen = document.getElementById('results-screen');
-        
-        const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
-        const nextToDifficultyButton = document.getElementById('next-to-difficulty-button');
-        const backToCategoryButton = document.getElementById('back-to-category-button');
-        const difficultyButtons = document.querySelectorAll('.difficulty-button');
-
-        const gameTimerDisplay = document.getElementById('game-timer-display');
-        const questionCounterDisplay = document.getElementById('question-counter');
-        const scoreDisplay = document.getElementById('score-display');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const hintButton = document.getElementById('hint-button');
-        const hintArea = document.getElementById('hint-area');
-        
-        const titleDisplay = document.getElementById('title-display');
-        const finalScoreDisplay = document.getElementById('final-score');
-        const questionsAnsweredCountDisplay = document.getElementById('questions-answered-count');
-        const incorrectAnswersList = document.getElementById('incorrect-answers-list');
-        const noMistakesMessage = document.getElementById('no-mistakes-message');
-        const retryIncorrectButton = document.getElementById('retry-incorrect-button');
-        const playAgainButton = document.getElementById('play-again-button');
-
-        let selectedCategories = [];
-        let currentDifficulty = '';
-        let allGeneratedQuestions = [];
-        let currentQuestionIndex = 0;
-        let questionsAnsweredInGame = 0;
+        // --- 状態管理 ---
+        let currentUnit = '';
+        let currentMode = '';
+        let currentLevel = '';
         let score = 0;
-        let incorrectAnswers = [];
-        let gameTimerInterval;
-        let isRetrying = false;
+        let gameTimer;
+        const timeLimit = 60; // 制限時間（秒）
+        let timeRemaining;
+        let questionsPool = [];
+        let currentQuestionIndex = -1;
 
-        categoryCheckboxes.forEach(cb => cb.addEventListener('change', () => {
-            nextToDifficultyButton.disabled = getSelectedCategoriesInternal().length === 0;
-        }));
-
-        nextToDifficultyButton.addEventListener('click', () => {
-            selectedCategories = getSelectedCategoriesInternal();
-            if (selectedCategories.length > 0) {
-                switchScreen('difficulty-selection-screen');
-            }
-        });
-
-        backToCategoryButton.addEventListener('click', () => {
-            switchScreen('category-selection-screen');
-        });
-
-        difficultyButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                currentDifficulty = button.dataset.difficulty;
-                startGameFlow(); // startGameFlowに変更
+        // --- 画面遷移 ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
             });
-        });
-        
-        playAgainButton.addEventListener('click', () => {
-            isRetrying = false;
-            switchScreen('category-selection-screen');
-            resetGame();
-        });
-
-        retryIncorrectButton.addEventListener('click', () => {
-            if (incorrectAnswers.length > 0) {
-                isRetrying = true;
-                allGeneratedQuestions = [...incorrectAnswers];
-                incorrectAnswers.forEach(q => delete q.userAnswer);
-                currentQuestionIndex = 0;
-                questionsAnsweredInGame = 0;
-                hintArea.style.display = 'none';
-                hintButton.disabled = false;
-                switchScreen('game-screen');
-                gameTimerDisplay.textContent = "解きなおし中 (時間制限なし)";
-                loadNextQuestion();
-            }
-        });
-        
-        hintButton.addEventListener('click', showHint);
-
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
+            stopGameTimer(); // 画面が切り替わったら必ずタイマーを止める
+            resetFeedback();
         }
 
-        function getSelectedCategoriesInternal() { // 関数名を変更して衝突を避ける
-            return Array.from(categoryCheckboxes)
-                        .filter(cb => cb.checked)
-                        .map(cb => cb.value);
-        }
-        
-        function resetGame() {
-            selectedCategories = [];
-            currentDifficulty = '';
-            allGeneratedQuestions = [];
-            currentQuestionIndex = 0;
-            questionsAnsweredInGame = 0;
-            score = 0;
-            incorrectAnswers = [];
-            clearInterval(gameTimerInterval);
-            gameTimerDisplay.textContent = `残り時間: ${GAME_DURATION_SECONDS}秒`;
-            scoreDisplay.textContent = "得点: 0";
-            questionCounterDisplay.textContent = "問題: 1";
-            hintArea.style.display = 'none';
-            hintButton.disabled = false;
-            categoryCheckboxes.forEach(cb => cb.checked = false);
-            nextToDifficultyButton.disabled = true;
+        // --- 単位・モード・レベル選択 ---
+        function selectUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('mode-select-title').innerText = `【${unitNames[currentUnit]}】のモードをえらぼう！`;
+            showScreen('mode-select-screen'); // ★修正点1: 次の画面に遷移させる
         }
 
-        function startGameFlow() { // startGameから変更して、問題生成と開始を分離
-            allGeneratedQuestions = generateAllPossibleQuestions(selectedCategories, currentDifficulty);
-            if (allGeneratedQuestions.length === 0) {
-                alert("問題を作成できませんでした。カテゴリや難易度を変えてお試しください。");
-                switchScreen('difficulty-selection-screen');
-                return;
+        function selectMode(mode) {
+            currentMode = mode;
+            if (currentMode === 'practice') {
+                showScreen('level-select-screen');
+            } else { // sense モード
+                currentLevel = '';
+                startGame();
             }
-            for (let i = allGeneratedQuestions.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [allGeneratedQuestions[i], allGeneratedQuestions[j]] = [allGeneratedQuestions[j], allGeneratedQuestions[i]];
+        }
+
+        function startPractice(level) {
+            currentLevel = level;
+            startGame();
+        }
+
+        // --- ゲーム開始 ---
+        function startGame() {
+            score = 0;
+            document.getElementById('score').innerText = score;
+
+            if (currentMode === 'practice') {
+                document.getElementById('question-screen-title').innerText = `【${unitNames[currentUnit]}・${levelNames[currentLevel]}】れんしゅうもんだい`;
+                questionsPool = [...practiceQuestions[currentUnit][currentLevel]];
+            } else { // sense モード
+                document.getElementById('question-screen-title').innerText = `【${unitNames[currentUnit]}】たんいをかんじてみよう！`;
+                questionsPool = [...senseQuestions[currentUnit]];
             }
             
-            currentQuestionIndex = 0;
-            questionsAnsweredInGame = 0;
-            score = 0;
-            incorrectAnswers = [];
-            scoreDisplay.textContent = "得点: 0";
-            questionCounterDisplay.textContent = "問題: 1";
-            hintArea.style.display = 'none';
-            hintButton.disabled = false;
-
-            switchScreen('game-screen');
-            loadNextQuestion();
-            if (!isRetrying) {
-                 startOverallGameTimer();
-            }
+            shuffleArray(questionsPool);
+            currentQuestionIndex = -1;
+            
+            showScreen('question-screen');
+            startGameTimer();
+            nextQuestion();
         }
-        
-        function startOverallGameTimer() {
-            let timeLeft = GAME_DURATION_SECONDS;
-            gameTimerDisplay.textContent = `残り時間: ${timeLeft}秒`;
-            gameTimerInterval = setInterval(() => {
-                timeLeft--;
-                gameTimerDisplay.textContent = `残り時間: ${timeLeft}秒`;
-                if (timeLeft <= 0) {
-                    clearInterval(gameTimerInterval);
-                    endGame();
+
+        // --- ゲームタイマー機能 ---
+        function startGameTimer() {
+            timeRemaining = timeLimit;
+            const timerCountEl = document.getElementById('timer-count');
+            timerCountEl.innerText = timeRemaining;
+            timerCountEl.style.color = '#d9534f';
+            
+            stopGameTimer(); // 念のため既存のタイマーをクリア
+
+            gameTimer = setInterval(() => {
+                timeRemaining--;
+                timerCountEl.innerText = timeRemaining;
+
+                if (timeRemaining <= 5) {
+                    timerCountEl.style.color = 'red';
+                }
+
+                if (timeRemaining <= 0) {
+                    stopGameTimer();
+                    showResult();
                 }
             }, 1000);
         }
 
-        function loadNextQuestion() {
-            hintArea.style.display = 'none';
-            hintButton.disabled = false;
-            optionsContainer.querySelectorAll('button').forEach(btn => {
-                btn.classList.remove('correct-highlight', 'wrong-highlight');
-                btn.style.backgroundColor = ''; 
-                btn.disabled = false;
-            });
-
-            if (currentQuestionIndex < allGeneratedQuestions.length) {
-                const question = allGeneratedQuestions[currentQuestionIndex];
-                if (!question) { // 万が一questionがundefinedの場合
-                    console.error("Error: Current question is undefined. Index:", currentQuestionIndex, "Pool size:", allGeneratedQuestions.length);
-                    if (!isRetrying) endGame(); else showResultsScreen();
-                    return;
-                }
-                questionText.textContent = question.text;
-                questionCounterDisplay.textContent = `問題: ${questionsAnsweredInGame + 1}`;
-                optionsContainer.innerHTML = '';
-                question.options.forEach((optionText, index) => {
-                    const button = document.createElement('button');
-                    button.textContent = optionText;
-                    button.addEventListener('click', () => selectAnswer(index, button));
-                    optionsContainer.appendChild(button);
-                });
-            } else {
-                if (!isRetrying) endGame();
-                else {
-                    alert("間違えた問題をすべて解きなおしました！");
-                    showResultsScreen();
-                }
-            }
-        }
-        
-        function showHint() {
-            const question = allGeneratedQuestions[currentQuestionIndex];
-            if (question && question.hint) {
-                hintArea.textContent = question.hint;
-                hintArea.style.display = 'block';
-                hintButton.disabled = true;
-            }
+        function stopGameTimer() {
+            clearInterval(gameTimer);
         }
 
-        function selectAnswer(selectedIndex, buttonElement) {
-            const question = allGeneratedQuestions[currentQuestionIndex];
-            if (!question) { console.error("selectAnswer: question undefined"); return; } // 安全策
-            const isCorrect = selectedIndex === question.correctAnswerIndex;
-            hintButton.disabled = true;
+        // --- 問題進行 ---
+        function nextQuestion() {
+            if (timeRemaining <= 0) return; // 時間切れなら何もしない
 
-            optionsContainer.querySelectorAll('button').forEach((btn, idx) => {
-                btn.disabled = true;
-                if (idx === question.correctAnswerIndex) {
-                    btn.classList.add('correct-highlight');
-                }
+            resetFeedback();
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= questionsPool.length) {
+                currentQuestionIndex = 0; // 問題が尽きたら最初からループ
+                shuffleArray(questionsPool);
+            }
+
+            const questionData = questionsPool[currentQuestionIndex];
+            const answerUnit = questionData.unit || '';
+            document.getElementById('question-text').innerHTML = `${questionData.q}${answerUnit ? ' は？' : ''} <span class="highlight">${answerUnit}</span>`;
+
+            let choices = [questionData.a, ...questionData.incorrects];
+            shuffleArray(choices);
+
+            const choicesGrid = document.getElementById('choices-grid');
+            choicesGrid.innerHTML = '';
+            choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.classList.add('btn', 'btn-answer');
+                const choiceText = (typeof choice === 'number' && Number.isInteger(choice)) ? choice.toString() : choice;
+                button.innerText = choiceText;
+                button.onclick = () => checkAnswer(choice, questionData.a);
+                choicesGrid.appendChild(button);
             });
+        }
+
+        // --- 回答チェック ---
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            disableChoices();
+            const feedbackEl = document.getElementById('feedback');
+            
+            let isCorrect = (typeof correctAnswer === 'number')
+                ? parseFloat(selectedAnswer) === correctAnswer
+                : selectedAnswer === correctAnswer;
 
             if (isCorrect) {
-                score += POINTS_PER_CORRECT_ANSWER;
+                score += 100;
+                document.getElementById('score').innerText = score;
+                const correctMessages = ["ピンポン！せいかい！", "すごい！そのとおり！", "よくできたね！", "さすが！たんいマスター！"];
+                feedbackEl.innerText = correctMessages[Math.floor(Math.random() * correctMessages.length)];
+                feedbackEl.classList.add('correct');
             } else {
-                score += PENALTY_FOR_WRONG_ANSWER;
-                if (buttonElement) buttonElement.classList.add('wrong-highlight');
-                const incorrectQ = { ...question, userAnswer: buttonElement ? buttonElement.textContent : "不明" };
-                if(!isRetrying) incorrectAnswers.push(incorrectQ);
+                const incorrectMessages = ["ブブー！おしい！", "ちがうみたい…", "もういちどかんがえてみよう！"];
+                let message = incorrectMessages[Math.floor(Math.random() * incorrectMessages.length)];
+                const formattedCorrectAnswer = (typeof correctAnswer === 'number' && Number.isInteger(correctAnswer)) ? correctAnswer.toString() : correctAnswer;
+                message += `\nせいかいは「${formattedCorrectAnswer}」だよ。`;
+                feedbackEl.innerText = message;
+                feedbackEl.classList.add('incorrect');
             }
-            score = Math.max(0, score);
-            scoreDisplay.textContent = `得点: ${score}`;
-            questionsAnsweredInGame++;
-            currentQuestionIndex++;
 
-            if (isRetrying || (gameTimerInterval && parseInt(gameTimerDisplay.textContent.split(" ")[1] || "0") > 0) ) {
-                setTimeout(() => {
-                    loadNextQuestion();
-                }, 700);
-            } else if (!isRetrying) {
-                 endGame();
-            }
-        }
-        
-        function endGame() {
-            clearInterval(gameTimerInterval);
-            gameTimerDisplay.textContent = "時間切れ！";
-            setTimeout(showResultsScreen, 1000);
+            showFeedback();
+            setTimeout(() => {
+                if(timeRemaining > 0) nextQuestion();
+            }, 1200); // 1.2秒後に次の問題へ
         }
 
-        function showResultsScreen() {
-            switchScreen('results-screen');
-            titleDisplay.textContent = getTitle(score);
-            finalScoreDisplay.textContent = `最終得点: ${score}点`;
-            questionsAnsweredCountDisplay.textContent = `解答数: ${questionsAnsweredInGame}問`;
-
-            incorrectAnswersList.innerHTML = '';
-            if (incorrectAnswers.length > 0) {
-                noMistakesMessage.style.display = 'none';
-                retryIncorrectButton.style.display = 'inline-block';
-                incorrectAnswers.forEach(q => {
-                    const li = document.createElement('li');
-                    const displayQuestionValue = q.questionValue !== undefined ? q.questionValue : q.text.split(" ")[0];
-                    li.innerHTML = `<p><strong>問題:</strong> ${displayQuestionValue} は？ (元の問題文:${q.text})</p> <p><strong>あなたの答え:</strong> ${q.userAnswer}</p> <p><strong class="correct-answer">正しい答え:</strong> ${q.correctValue}</p> <p class="explanation"><strong>解説:</strong> ${q.explanation}</p>`;
-                    incorrectAnswersList.appendChild(li);
-                });
-            } else {
-                noMistakesMessage.style.display = 'block';
-                retryIncorrectButton.style.display = 'none';
-                 if(questionsAnsweredInGame > 0) noMistakesMessage.textContent = "全問正解！素晴らしい！";
-                 else noMistakesMessage.textContent = "時間内に解答できませんでした。もう一度挑戦しよう！";
-            }
+        // --- 結果表示 ---
+        function showResult() {
+            showScreen('result-screen');
+            document.getElementById('final-score').innerText = score;
+            
+            const medal = getMedal(score);
+            document.getElementById('medal-icon').innerText = medal.icon;
+            document.getElementById('medal-name').innerText = medal.name;
+            document.getElementById('result-message').innerHTML = `<span style="font-size: 2rem; vertical-align: middle;">🎓</span> ${medal.message}`;
         }
 
-        function getTitle(currentScore) {
-            if (currentScore >= 200) return "🏆 単位換算ゴッド 🏆";
-            if (currentScore >= 150) return "🎉 単位換算チャンピオン！ 🎉";
-            if (currentScore >= 100) return "🥇 単位換算マスター 🥇";
-            if (currentScore >= 70) return "🥈 単位換算エキスパート 🥈";
-            if (currentScore >= 40) return "🥉 単位換算じょうず 🥉";
-            if (currentScore >= 10) return "💪 もうすこし！がんばろう 💪";
-            return "📝 ファイト！また挑戦しよう 📝";
-        }
-        
-        function gcd(a,b){ if(b===0) return a; return gcd(b, a%b); }
-
-        function formatNumber(num, difficulty) {
-            let s;
-            if (difficulty !== 'hard' || (typeof num === 'number' && Number.isInteger(num)) ) {
-                return String(Math.round(num));
-            }
-            if (num === 0) return "0";
-            s = parseFloat(num.toFixed(MAX_ZERO_COUNT_IN_OPTIONS + 3)).toString();
-            if (s.includes('.')) { s = s.replace(/0+$/, '').replace(/\.$/, ''); }
-            return s;
+        function getMedal(score) {
+            if (score >= 2000) return { icon: '🌈', name: 'レインボーメダル', message: 'すばらしい！きみはもはや「たんい神」じゃ！' };
+            if (score >= 1500) return { icon: '🥇', name: '金のメダル', message: 'すごいぞ！たんいマスターの称号をさずけよう！' };
+            if (score >= 1000) return { icon: '🥈', name: '銀のメダル', message: 'よくがんばった！たんい博士まであと一歩じゃ！' };
+            if (score >= 500)  return { icon: '🥉', name: '銅のメダル', message: 'やったね！だいぶ単位になれてきたのう！' };
+            return { icon: '📜', name: '参加賞', message: 'おつかれさま！つぎはメダルを目指してがんばろう！' };
         }
 
-        function hasAcceptableZeroCount(value, difficulty) {
-            const numStr = formatNumber(value, difficulty);
-            if (numStr.includes('e')) return true;
-            if (numStr.includes('.') && difficulty === 'hard') return true;
-            let significantPart = numStr;
-            let zeroCount = 0;
-            if (significantPart.length > 1 && significantPart !== "0") {
-                 for(let i = significantPart.length -1; i >=0; i--) { if(significantPart[i] === '0') zeroCount++; else break; }
-            }
-            return zeroCount <= MAX_ZERO_COUNT_IN_OPTIONS;
+        function restartQuiz() {
+            // 現在の設定でゲームを再開する
+            startGame();
         }
 
-        function isValueWithinLimits(value, difficulty) {
-            const numStr = formatNumber(value, difficulty);
-            if (numStr.includes('e')) { return true; }
-
-            if (!hasAcceptableZeroCount(value, difficulty) && difficulty !== 'hard') return false;
-
-            const num = parseFloat(numStr); // parseFloatで数値に戻して比較
-            if (difficulty !== 'hard') {
-                return Number.isInteger(num) && num >= (difficulty === 'easy' ? 0 : 1) && num <= MAX_VALUE_EASY_NORMAL;
-            } else {
-                const absValue = Math.abs(num);
-                if (num === 0) return true;
-                // MIN_VALUE_HARD より小さい正の数も許容する (例: 0.00005 など)
-                return absValue > 0 && absValue <= MAX_VALUE_HARD;
-            }
+        // --- 補助関数 ---
+        function showFeedback() {
+             document.getElementById('feedback').style.display = 'block';
         }
 
-
-        function generateSingleQuestion(categoryKey, difficulty) {
-            const MAX_ATTEMPTS_PER_Q = 250;
-            for (let attempt = 0; attempt < MAX_ATTEMPTS_PER_Q; attempt++) {
-                const categoryData = UNIT_DEFINITIONS[categoryKey];
-                if (!categoryData || !categoryData.units) {
-                    console.error(`Error: UNIT_DEFINITIONS for ${categoryKey} is invalid.`);
-                    return null;
-                }
-                const availableUnits = categoryData.units;
-                if (availableUnits.length < 2) return null;
-
-                let unit1Idx, unit2Idx, fromUnit, toUnit;
-                let questionValueNum, correctAnswerValueNum;
-
-                if (difficulty === 'easy') {
-                    const easyPairs = [];
-                    for(let i=0; i < availableUnits.length -1; i++){
-                        easyPairs.push([i, i+1]); easyPairs.push([i+1, i]);
-                    }
-                    // 特別なペアの追加 (例: 長さのmとkm)
-                    if (categoryKey === 'length') {
-                        const mIdx = availableUnits.findIndex(u => u.name === 'm');
-                        const kmIdx = availableUnits.findIndex(u => u.name === 'km');
-                        if (mIdx !== -1 && kmIdx !== -1) {
-                            easyPairs.push([mIdx, kmIdx]); easyPairs.push([kmIdx, mIdx]);
-                        }
-                    }
-                    if (categoryKey === 'volume') {
-                        const lIdx = availableUnits.findIndex(u => u.name === 'L');
-                        const mlIdx = availableUnits.findIndex(u => u.name === 'mL');
-                        const klIdx = availableUnits.findIndex(u => u.name === 'kL');
-                        if (lIdx !== -1 && mlIdx !== -1) { easyPairs.push([lIdx, mlIdx]); easyPairs.push([mlIdx, lIdx]); }
-                        if (lIdx !== -1 && klIdx !== -1) { easyPairs.push([lIdx, klIdx]); easyPairs.push([klIdx, lIdx]); }
-                    }
-
-                    if(easyPairs.length === 0) {
-                        unit1Idx = Math.floor(Math.random() * availableUnits.length);
-                        do { unit2Idx = Math.floor(Math.random() * availableUnits.length); } while (unit1Idx === unit2Idx);
-                    } else {
-                        const pair = easyPairs[Math.floor(Math.random() * easyPairs.length)];
-                        unit1Idx = pair[0]; unit2Idx = pair[1];
-                         if (unit1Idx === undefined || unit2Idx === undefined || unit1Idx >= availableUnits.length || unit2Idx >= availableUnits.length || unit1Idx === unit2Idx) {
-                            continue; // 不正なペアなら再試行
-                        }
-                    }
-                } else {
-                    unit1Idx = Math.floor(Math.random() * availableUnits.length);
-                    do { unit2Idx = Math.floor(Math.random() * availableUnits.length); } while (unit1Idx === unit2Idx);
-                }
-                fromUnit = availableUnits[unit1Idx];
-                toUnit = availableUnits[unit2Idx];
-
-                if (difficulty === 'easy') {
-                    questionValueNum = 1;
-                    if (categoryKey === 'time') {
-                        if (fromUnit.name === "日" && toUnit.name === "時間") questionValueNum = 1;
-                        else if (fromUnit.name === "時間" && toUnit.name === "分") questionValueNum = 1;
-                        else if (fromUnit.name === "分" && toUnit.name === "秒") questionValueNum = 1;
-                        else if (fromUnit.name === "時間" && toUnit.name === "日") questionValueNum = 24;
-                        else if (fromUnit.name === "分" && toUnit.name === "時間") questionValueNum = 60;
-                        else if (fromUnit.name === "秒" && toUnit.name === "分") questionValueNum = 60;
-                        else { if(Math.random() < 0.85) continue; questionValueNum = 1;}
-                    }
-                } else if (difficulty === 'normal') {
-                    if (categoryKey === 'time') {
-                        const timeVals = [1,2,3,4,5,6,10,12,15,20,24,30,45,50,60,90,120,150,180,240,300,360,480,600];
-                        questionValueNum = timeVals[Math.floor(Math.random() * timeVals.length)];
-                        if ((fromUnit.name === "日" && toUnit.name === "秒") || (toUnit.name === "日" && fromUnit.name === "秒")) {if(Math.random()<0.95)continue;};
-                         if (fromUnit.baseFactor / toUnit.baseFactor > 72000 || toUnit.baseFactor / fromUnit.baseFactor > 72000) {if(Math.random()<0.95)continue;}; // さらに制限
-                    } else {
-                        const normalValues = [2,3,4,5,6,7,8,9,10,12,15,20,25,30,40,50,60,75,80,100,120,150,200,250,300,400,500,600,750,800,1000,1250,1500,2000,2500,3000,4000,5000, 10000, 20000];
-                        questionValueNum = normalValues[Math.floor(Math.random() * normalValues.length)];
-                    }
-                } else { // difficulty === 'hard'
-                    if (categoryKey === 'time') {
-                        const timeValsHard = [1.5, 2.5, 0.5, 0.25, 75, 135, 210, 1500, 48, 72, 90, 100, 3600, 6000, 7200, 8640];
-                        questionValueNum = timeValsHard[Math.floor(Math.random() * timeValsHard.length)];
-                        if(Math.random() < 0.5) {
-                             const timeVals = [1,2,3,4,5,6,10,12,15,20,24,30,45,50,60,90,120,150,180,240,300,360,480,600,1200,1440];
-                             questionValueNum = timeVals[Math.floor(Math.random() * timeVals.length)];
-                        }
-                    } else {
-                        const hardBase = [0.01, 0.02, 0.025, 0.04, 0.05, 0.1, 0.125, 0.2, 0.25, 0.4, 0.5, 0.75, 0.8, 1, 1.2, 1.25, 1.5, 1.6, 2, 2.4, 2.5, 3, 3.5, 4, 5, 6, 7.5, 8, 10, 12, 12.5, 15, 16, 20, 24, 25, 30, 40, 50, 60, 75, 80, 100, 120, 125, 150, 160, 200, 240, 250, 300, 400, 500, 600, 750, 800, 1000, 1200, 1500, 1600, 2000, 2500, 3000, 4000, 5000, 6000, 8000, 10000];
-                        questionValueNum = hardBase[Math.floor(Math.random() * hardBase.length)];
-                        const scaleRatio = fromUnit.baseFactor / toUnit.baseFactor;
-                        if (scaleRatio > 100000 && questionValueNum > 0.1) questionValueNum /= ((Math.floor(Math.random()*5)+1)*1000);
-                        else if (scaleRatio > 10000 && questionValueNum > 0.5) questionValueNum /= ((Math.floor(Math.random()*5)+1)*100);
-                        else if (scaleRatio > 1000 && questionValueNum > 1) questionValueNum /= ((Math.floor(Math.random()*5)+1)*10);
-                        if (scaleRatio < 0.00001 && questionValueNum < 10000 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*1000);
-                        else if (scaleRatio < 0.0001 && questionValueNum < 1000 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*100);
-                        else if (scaleRatio < 0.01 && questionValueNum < 100 && questionValueNum !==0) questionValueNum *= ((Math.floor(Math.random()*5)+1)*10);
-                    }
-                    questionValueNum = parseFloat(questionValueNum.toFixed(4));
-                }
-                
-                correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
-
-                if (difficulty !== 'hard') {
-                    let originalCorrect = correctAnswerValueNum;
-                    correctAnswerValueNum = Math.round(correctAnswerValueNum);
-                     // 答えが0になる場合、元の値が非常に小さい場合なので、questionValueNumを調整する
-                    if (correctAnswerValueNum === 0 && originalCorrect > 0 && difficulty !== 'easy') { // かんたんは0の答えを許容
-                         // questionValueNumを、答えが最低でも1になるように調整
-                        let minQ = toUnit.baseFactor / fromUnit.baseFactor; // 答えが1になるquestionValue
-                        if (minQ < 1 && Number.isInteger(1/minQ)) minQ = 1/minQ; // 逆数も考慮
-                        else minQ = Math.max(1, Math.ceil(minQ));
-                        questionValueNum = minQ;
-                        correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
-                        correctAnswerValueNum = Math.round(correctAnswerValueNum);
-                    }
-                    if (!Number.isInteger(questionValueNum) && categoryKey !== 'time') { // 時間以外は問題も整数にしたい
-                        questionValueNum = Math.round(questionValueNum);
-                        if(questionValueNum === 0 && difficulty !== 'easy') questionValueNum = 1;
-                        correctAnswerValueNum = (questionValueNum * fromUnit.baseFactor) / toUnit.baseFactor;
-                        correctAnswerValueNum = Math.round(correctAnswerValueNum);
-                    }
-                    if (!Number.isInteger(correctAnswerValueNum) || correctAnswerValueNum < (difficulty === 'easy' ? 0:1) ) continue;
-                    if (questionValueNum < (difficulty === 'easy' ? 0:1)) continue; // 問題の値も0以上または1以上
-                } else {
-                     correctAnswerValueNum = parseFloat(correctAnswerValueNum.toFixed(5));
-                     if (correctAnswerValueNum === 0 && questionValueNum !== 0) { // 鬼モードで答えが0になるのは避ける (問題が0でない限り)
-                         if (Math.abs(questionValueNum * fromUnit.baseFactor / toUnit.baseFactor) < MIN_VALUE_HARD) continue;
-                     }
-                }
-
-                if (!isValueWithinLimits(questionValueNum, difficulty) || !isValueWithinLimits(correctAnswerValueNum, difficulty)) {
-                    continue;
-                }
-
-                const qText = `${formatNumber(questionValueNum, difficulty)}${fromUnit.name} は？`;
-                const options = new Set();
-                const correctAnswerFormatted = formatNumber(correctAnswerValueNum, difficulty);
-                options.add(correctAnswerFormatted);
-                let distractorCount = 0;
-
-                if (difficulty === 'easy' && categoryKey !== 'time') {
-                     const easyFactors = [10, 0.1, 100, 0.01, 1000, 0.001, 0];
-                    easyFactors.sort(() => Math.random() -0.5);
-                    for(const factor of easyFactors){
-                        if(options.size >= 4) break;
-                        let distVal = (factor === 0 && correctAnswerValueNum !== 0) ? 0 : correctAnswerValueNum * factor;
-                        if (correctAnswerValueNum === 0) {
-                             const zeroAnsOpts = [0, 1, 10, 100, 1000];
-                             distVal = zeroAnsOpts[Math.floor(Math.random()*zeroAnsOpts.length)];
-                        } else { distVal = Math.round(distVal); }
-                        const dist = formatNumber(distVal, difficulty);
-                        if(!options.has(dist) && dist !== correctAnswerFormatted && isValueWithinLimits(distVal,difficulty)) options.add(dist);
-                    }
-                } else if (categoryKey === 'time' && (difficulty === 'easy' || difficulty === 'normal') ) {
-                    let baseAns = Math.round(correctAnswerValueNum);
-                    const timeOptionDeltas = [Math.max(1, Math.floor(baseAns*0.5)), Math.max(1,Math.floor(baseAns*0.25)), baseAns*2, baseAns*3, Math.max(0, baseAns-1), baseAns+1, baseAns*10, Math.max(0, Math.round(baseAns/10))];
-                    if (baseAns === 0 && difficulty==='easy') timeOptionDeltas.push(0,1,60,24);
-                    timeOptionDeltas.sort(() => Math.random()-0.5);
-                    for(const delta of timeOptionDeltas){
-                        if(options.size >=4) break;
-                        let distVal;
-                        if(Math.random() < 0.6 && baseAns >= delta ) distVal = baseAns - delta; // baseAns >= delta でないと負になる
-                        else distVal = baseAns + delta;
-                        distVal = Math.max(0, Math.round(distVal));
-                        const distStr = formatNumber(distVal, difficulty);
-                        if(!options.has(distStr) && distStr !== correctAnswerFormatted && isValueWithinLimits(distVal, difficulty)) options.add(distStr);
-                    }
-                }
-                
-                const distractorPowers = difficulty === 'hard' ? [-4,-3, -2, -1, 1, 2, 3, 4] : [-2, -1, 1, 2, 0.5, 2.5]; // ふつうにも小数点を少し混ぜる
-                distractorPowers.sort(() => Math.random() - 0.5);
-                for (const power of distractorPowers) {
-                    if (options.size >= 4) break;
-                    let distractorNum = correctAnswerValueNum * ( (typeof power === 'number' && (power < 0 || power > 0 && power <=4)) ? Math.pow(10, power) : power ); // 0.5や2.5のような係数も使えるように
-                    if (difficulty !== 'hard') distractorNum = Math.round(distractorNum);
-                    else distractorNum = parseFloat(distractorNum.toFixed(5));
-
-                    if (isValueWithinLimits(distractorNum, difficulty) && (difficulty === 'hard' || hasAcceptableZeroCount(distractorNum, difficulty))) {
-                        const formattedDistractor = formatNumber(distractorNum, difficulty);
-                        if (!options.has(formattedDistractor) && formattedDistractor !== correctAnswerFormatted) {
-                            options.add(formattedDistractor);
-                        }
-                    }
-                }
-                while (options.size < 4 && distractorCount < 50) {
-                    distractorCount++;
-                    let distractorNum;
-                    if(difficulty !== 'hard' && Math.random() < 0.7) {
-                        distractorNum = Math.round(correctAnswerValueNum) + (Math.floor(Math.random()* (difficulty==='easy'? 5:15) )+1) * (Math.random() > 0.5 ? 1: -1);
-                        distractorNum = Math.max((difficulty === 'easy' ? 0 : 1), distractorNum);
-                    } else {
-                        distractorNum = correctAnswerValueNum * Math.pow(10, (Math.floor(Math.random()* (difficulty==='easy'?2: (difficulty==='normal'?3:4)) )+1) * (Math.random() > 0.5 ? 1: -1));
-                    }
-                     if (difficulty !== 'hard') distractorNum = Math.round(distractorNum);
-                     else distractorNum = parseFloat(distractorNum.toFixed(5));
-
-                    if (isValueWithinLimits(distractorNum, difficulty) && (difficulty === 'hard' || hasAcceptableZeroCount(distractorNum, difficulty))) {
-                        const formattedDistractor = formatNumber(distractorNum, difficulty);
-                        if (!options.has(formattedDistractor) && formattedDistractor !== correctAnswerFormatted) {
-                            options.add(formattedDistractor);
-                        }
-                    }
-                }
-                const fillOptionsBase = difficulty === 'easy' ? [0,1,10,100,1000] : [1,10,100,1000,0.1,0.01, 0.001, 0.5, 2, 5];
-                let fillOptions = [];
-                if (difficulty !== 'hard') {
-                    fillOptions = fillOptionsBase.filter(n => Number.isInteger(n) && n>= (difficulty==='easy'?0:1) );
-                } else {
-                    fillOptions = fillOptionsBase;
-                }
-
-                while (options.size < 4) {
-                    if (fillOptions.length === 0) {
-                        options.add(formatNumber(correctAnswerValueNum + options.size + Math.random()*0.1, difficulty));
-                        if(options.size >=4) break; continue;
-                    }
-                    const fillVal = fillOptions[Math.floor(Math.random()*fillOptions.length)];
-                    const fillStr = formatNumber(fillVal, difficulty);
-                    if(!options.has(fillStr) && fillStr !== correctAnswerFormatted && isValueWithinLimits(fillVal,difficulty)) options.add(fillStr);
-                    else options.add(formatNumber(correctAnswerValueNum / (options.size + Math.random()*0.5 + 1.05), difficulty));
-                    if(options.size >= 4) break;
-                }
-
-                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
-                const correctIdx = shuffledOptions.findIndex(opt => opt === correctAnswerFormatted);
-
-                let hintText = `ヒント: ${fromUnit.name} と ${toUnit.name} の関係を思い出そう。`;
-                const directConv = categoryData.conversions.find(c => (c.from === fromUnit.name && c.to === toUnit.name) || (c.from === toUnit.name && c.to === fromUnit.name));
-                if (directConv) hintText = `ヒント: ${directConv.relation}`;
-
-                let explanation = `1${fromUnit.name} は ${formatNumber(fromUnit.baseFactor / toUnit.baseFactor, difficulty)}${toUnit.name} です。 だから、${formatNumber(questionValueNum, difficulty)}${fromUnit.name} は ${correctAnswerFormatted}${toUnit.name} になります。`;
-
-                return {
-                    text: qText, options: shuffledOptions.map(opt => `${opt}${toUnit.name}`),
-                    correctAnswerIndex: correctIdx, correctValue: `${correctAnswerFormatted}${toUnit.name}`,
-                    questionValue: `${formatNumber(questionValueNum, difficulty)}${fromUnit.name}`, 
-                    explanation: explanation, hint: hintText, category: categoryKey
-                };
-            }
-            // console.warn(`generateSingleQuestion: ${categoryKey} (${difficulty}) で問題生成に ${MAX_ATTEMPTS_PER_Q}回失敗しました。`);
-            return null;
+        function resetFeedback() {
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            enableChoices();
         }
 
-        function generateAllPossibleQuestions(categories, difficulty) {
-            const questions = [];
-            // 各カテゴリから均等に問題を選ぶため、カテゴリごとに上限を設定
-            // ただし、時間内に多くの問題に答えられるように、プールは多めに用意する
-            const questionsToAimPerCategory = Math.max(5, Math.ceil( (GAME_DURATION_SECONDS / 3) / categories.length) + 15); // 1問3秒と仮定 + α
-            let totalGenerated = 0;
-
-            categories.forEach(catKey => {
-                let generatedForThisCategory = 0;
-                for (let i = 0; i < questionsToAimPerCategory * 5 && generatedForThisCategory < questionsToAimPerCategory; i++) { // 試行回数に余裕を持たせる
-                    const q = generateSingleQuestion(catKey, difficulty);
-                    if (q) {
-                        if (!questions.find(exQ => exQ.text === q.text && exQ.correctValue === q.correctValue)) {
-                            questions.push(q);
-                            generatedForThisCategory++;
-                            totalGenerated++;
-                        }
-                    }
-                }
+        function disableChoices() {
+            document.querySelectorAll('#choices-grid .btn-answer').forEach(button => {
+                button.disabled = true;
             });
-             // もし問題が極端に少ない場合（例えば1カテゴリのみで生成が難しい場合）、カテゴリ無視で追加生成を試みる
-            let emergencyAttempts = 0;
-            while(questions.length < Math.min(20, categories.length * 5) && emergencyAttempts < 100){ // 最低でも20問かカテゴリ*5問は欲しい
-                 const randomCatKey = categories[Math.floor(Math.random() * categories.length)];
-                 const q = generateSingleQuestion(randomCatKey, difficulty);
-                 if(q && !questions.find(exQ => exQ.text === q.text && exQ.correctValue === q.correctValue)){
-                     questions.push(q);
-                 }
-                 emergencyAttempts++;
-            }
+        }
 
-            if(questions.length === 0) console.warn("最終的に問題が1問も生成できませんでした。");
-            return questions;
+         function enableChoices() {
+            document.querySelectorAll('#choices-grid .btn-answer').forEach(button => {
+                button.disabled = false;
+            });
         }
         
-        switchScreen('category-selection-screen');
-        resetGame();
-
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function backToModeSelect() {
+            if (currentMode === 'practice') {
+                showScreen('level-select-screen');
+            } else {
+                showScreen('mode-select-screen');
+            }
+        }
+    
     </script>
 </body>
 </html>
